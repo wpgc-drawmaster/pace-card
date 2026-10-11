@@ -19,6 +19,8 @@ h1{font-size:24px;margin:12px 0}h2{font-size:20px;margin:18px 0 8px}
 .card{background:#145c2e;border-radius:12px;padding:12px;margin:10px 0}
 label{display:block;font-weight:700;margin:6px 0}input{font-size:22px;padding:10px;border-radius:8px;border:2px solid #fff;width:100%}
 button{font-size:20px;font-weight:800;border:0;border-radius:12px;padding:14px;min-height:56px;cursor:pointer}
+#wbtn{width:100%;font-size:24px;min-height:72px;margin-top:10px;background:#ff9f0a;color:#000;font-weight:900;border-radius:12px;border:0}#wbtn.on{background:#ff3b30;color:#fff}
+.chip{background:#e8f5e9;color:#0b3d1e;border:0;border-radius:16px;padding:6px 10px;margin:4px 4px 0 0;font-size:15px}
 .big{width:100%;background:#fff;color:#0b3d1e;font-size:24px;min-height:72px}
 .sm{background:#e8f5e9;color:#0b3d1e;font-size:16px;min-height:44px;padding:8px 12px;margin:4px 4px 0 0}
 .row{display:flex;justify-content:space-between;align-items:center;font-size:20px;margin-bottom:8px}
@@ -27,6 +29,12 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{border-bottom:1px
 </style></head><body>
 <h1 style="display:flex;align-items:center;gap:10px"><img src="logo.png" alt="WPGC" style="width:44px;height:44px;border-radius:50%">WPGC Pace Card</h1>
 <div id="live">—</div>
+<button id="wbtn">⏸ Start Wait</button>
+<div id="wbox" class="card" style="display:none">
+<label>Wait comment<input id="wcom" placeholder="e.g. Teebox 3"></label>
+<div id="chips"></div>
+</div>
+<div id="wlist"></div>
 <div class="card">
 <details id="set" open><summary id="sum" style="font-weight:800;cursor:pointer;padding:6px 0">Setup Round</summary>
 <label>Date<input id="dt" type="date"></label>
@@ -41,7 +49,7 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{border-bottom:1px
 <div id="cps"></div>
 <h2>History</h2>
 <label>Also email to (optional)<input id="cc" type="email" placeholder="name@example.com"></label>
-<button class="sm" id="csv">Email CSV</button>
+<button class="sm" id="csv">Email CSV</button> <button class="sm" id="wcsv">Email Wait Log CSV</button>
 <div id="hist"></div>
 <script>
 const HOLES=[4,9,13,18],FR=[59/250,125/250,181/250,1];
@@ -84,18 +92,43 @@ $('dt').value=st.date;$('dt').onchange=e=>{st.date=e.target.value||st.date;save(
 $('tee').onchange=e=>{st.tee=e.target.value||st.tee;save();render()};
 $('tgt').onchange=e=>{if(P.parseDur(e.target.value)){st.tgt=e.target.value}save();render()};
 $('now').onclick=()=>{const d=new Date();st.tee=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');st.date=d.toISOString().slice(0,10);$('dt').value=st.date;$('tee').value=st.tee;save();render()};
-$('newr').onclick=()=>{if(st.act.some(a=>a!=null)){const t=T();hist.push({course:st.course||'',grp:st.grp||'',cap:st.cap||'',date:st.date,tee:P.fmt12(P.hm(st.tee)),tgt:st.tgt,act:st.act.map(a=>a==null?'':P.fmt12(a)),delta:st.act.map((a,i)=>a==null?null:Math.round(a-t[i]))})}
- st={date:new Date().toISOString().slice(0,10),tee:st.tee,tgt:st.tgt,act:[null,null,null,null],course:st.course,grp:st.grp,cap:st.cap};save();$('dt').value=st.date;render()};
+$('newr').onclick=()=>{if(st.act.some(a=>a!=null)){const t=T();hist.push({course:st.course||'',grp:st.grp||'',cap:st.cap||'',date:st.date,tee:P.fmt12(P.hm(st.tee)),tgt:st.tgt,act:st.act.map(a=>a==null?'':P.fmt12(a)),delta:st.act.map((a,i)=>a==null?null:Math.round(a-t[i])),waits:(st.waits||[]).slice()})}
+ st={date:new Date().toISOString().slice(0,10),tee:st.tee,tgt:st.tgt,act:[null,null,null,null],course:st.course,grp:st.grp,cap:st.cap,waits:[],wait:null};save();$('dt').value=st.date;render()};
 $('cc').value=LS.getItem('pc_cc')||'';$('cc').onchange=e=>LS.setItem('pc_cc',e.target.value.trim());
-$('csv').onclick=()=>{const rows=[['course','group','captain_email','date','tee','target','h4','h9','h13','h18','d4','d9','d13','d18']].concat(hist.map(r=>[r.course||'',r.grp||'',r.cap||'',r.date,r.tee,r.tgt,...r.act,...r.delta.map(d=>d==null?'':(-d||0))]));
+$('csv').onclick=()=>{const rows=[['course','group','captain_email','date','tee','target','h4','h9','h13','h18','d4','d9','d13','d18','total_wait_min','wait_count']].concat(hist.map(r=>[r.course||'',r.grp||'',r.cap||'',r.date,r.tee,r.tgt,...r.act,...r.delta.map(d=>d==null?'':(-d||0)),wmin((r.waits||[]).reduce((s,w)=>s+w.secs,0)),(r.waits||[]).length]));
  if(rows.length<2){alert('No saved rounds yet. Tap "Save & new round" first.');return}
  const q=v=>{v=String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};const csv=rows.map(r=>r.map(q).join(',')).join('\n');const lastCap=(hist[hist.length-1]||{}).cap||'';const cc=[lastCap,$('cc').value.trim()].filter(Boolean).join(',');
  const d=new Date().toISOString().slice(0,10);
- location.href='mailto:drawmaster.wpgc@gmail.com?'+(cc?'cc='+encodeURIComponent(cc)+'&':'')+'subject='+encodeURIComponent('WPGC Pace Card CSV '+d)+'&body='+encodeURIComponent(csv)};
+ mail('WPGC Pace Card CSV '+d,csv)};
 // icon + manifest
 const c=document.createElement('canvas');c.width=c.height=180;const x=c.getContext('2d');x.fillStyle='#0b3d1e';x.fillRect(0,0,180,180);x.fillStyle='#fff';x.font='bold 70px sans-serif';x.textAlign='center';x.fillText('4:10',90,115);
 const icon=new URL('icon.png',location.href).href;
 $('mf').href='data:application/manifest+json,'+encodeURIComponent(JSON.stringify({name:'WPGC Pace Card',short_name:'Pace Card',display:'standalone',background_color:'#0b3d1e',theme_color:'#0b3d1e',start_url:location.href,icons:[{src:icon,sizes:'180x180',type:'image/png'}]}));
 render();setInterval(live,15000);
+function wmin(s){return (s/60).toFixed(1)}
+function mss(s){s=Math.round(s);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
+function qv(v){v=String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
+function mail(subj,body){const lastCap=(hist[hist.length-1]||{}).cap||st.cap||'';const cc=[lastCap,$('cc').value.trim()].filter(Boolean).join(',');
+ location.href='mailto:drawmaster.wpgc@gmail.com?'+(cc?'cc='+encodeURIComponent(cc)+'&':'')+'subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(body)}
+const hhmm=ms=>{const d=new Date(ms);return P.fmt12(d.getHours()*60+d.getMinutes())};
+function stretch(){const i=st.act.findIndex(a=>a==null);return i<0?'after 18':i==0?'holes 1-4':'holes '+(HOLES[i-1]+1)+'-'+HOLES[i]}
+['Teebox ','Fairway, waiting for green','Green','Par 3 tee'].forEach(c=>{const b=document.createElement('button');b.className='chip';b.textContent=c.trim();b.onclick=()=>{$('wcom').value=c;$('wcom').focus();if(st.wait){st.wait.comment=c;save()}};$('chips').appendChild(b)});
+$('wcom').oninput=e=>{if(st.wait){st.wait.comment=e.target.value;save()}};
+$('wbtn').onclick=()=>{st.waits=st.waits||[];
+ if(!st.wait){st.wait={start:Date.now(),comment:'',stretch:stretch()};$('wcom').value=''}
+ else{const w=st.wait;w.end=Date.now();w.secs=Math.round((w.end-w.start)/1000);w.comment=$('wcom').value.trim();st.waits.push(w);st.wait=null}
+ save();wrender()};
+window.wedit=i=>{const c=prompt('Comment for wait '+(i+1),st.waits[i].comment||'');if(c!=null){st.waits[i].comment=c.trim();save();wrender()}};
+window.wdel=i=>{if(confirm('Delete this wait?')){st.waits.splice(i,1);save();wrender()}};
+function wrender(){const on=!!st.wait;$('wbtn').className=on?'on':'';$('wbox').style.display=on?'block':'none';
+ $('wbtn').textContent=on?'■ Stop Wait  '+mss((Date.now()-st.wait.start)/1000):'⏸ Start Wait';
+ const ws=st.waits||[];const tot=ws.reduce((s,w)=>s+w.secs,0);
+ $('wlist').innerHTML=ws.length?'<details class="card"><summary style="font-weight:800;cursor:pointer">Waits this round: '+ws.length+' · total '+mss(tot)+'</summary>'+ws.map((w,i)=>'<div class="row" style="margin-top:6px"><span>'+hhmm(w.start)+' · <b>'+mss(w.secs)+'</b> · '+(w.comment||'<i>no comment</i>')+'</span><span><button class="chip" onclick="wedit('+i+')">Edit</button><button class="chip" onclick="wdel('+i+')">✕</button></span></div>').join('')+'</details>':''}
+$('wcsv').onclick=()=>{const rows=[['course','date','group','captain_email','tee','wait_no','start','end','wait_mmss','wait_min','stretch','comment']];
+ hist.forEach(r=>(r.waits||[]).forEach((w,i)=>rows.push([r.course||'',r.date,r.grp||'',r.cap||'',r.tee,i+1,hhmm(w.start),hhmm(w.end),mss(w.secs),wmin(w.secs),w.stretch||'',w.comment||''])));
+ if(rows.length<2){alert('No waits in saved rounds yet. Tap "Save & new round" first.');return}
+ mail('WPGC Wait Log CSV '+new Date().toISOString().slice(0,10),rows.map(r=>r.map(qv).join(',')).join('\n'))};
+setInterval(()=>{if(st.wait)wrender()},1000);
+wrender();
 }
 </script></body></html>
