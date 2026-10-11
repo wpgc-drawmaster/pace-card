@@ -44,6 +44,7 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{border-bottom:1px
 <label>Target Round Duration (h:mm)<input id="tgt" inputmode="numeric" value="4:10"></label>
 <label>Scheduled Tee Time<input id="tee" type="time" value="09:54"></label>
 <label>Captain Email (optional)<input id="cap" type="email" placeholder="captain@example.com"></label>
+<details id="alloc" style="margin-top:8px"><summary style="font-weight:700;cursor:pointer">Interval allocation</summary><div id="allocb"></div></details>
 <div style="margin-top:8px"><button class="sm" id="rst">Reset round</button> <button class="sm" id="clr" style="background:#ffdad6">Clear all history</button></div>
 </details>
 
@@ -61,11 +62,13 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{border-bottom:1px
 <button class="sm" id="csv">Email CSV</button> <button class="sm" id="wcsv">Email Wait Log CSV</button>
 <div id="hist"></div>
 <script>
-const HOLES=[4,9,13,18];
+const HOLES=[4,9,13,18],SEGS=[[1,4],[5,9],[10,13],[14,18]];
 const PARS={langara:[4,3,5,4,4,4,4,3,4,4,5,3,4,3,4,5,4,4],mccleery:[5,4,3,4,3,4,3,4,5,4,5,4,3,5,4,3,4,4]};
 const W={3:11,4:14,5:17};
-function courseFR(course){const c=(course||'').toLowerCase();const k=Object.keys(PARS).find(k=>c.includes(k));if(!k)return [59/250,125/250,181/250,1];
+function ckey(course){const c=(course||'').toLowerCase();return Object.keys(PARS).find(k=>c.includes(k))||'fraserview'}
+function defFR(course){const k=ckey(course);if(!PARS[k])return [59/250,125/250,181/250,1];
  const w=PARS[k].map(p=>W[p]);const cum=HOLES.map(h=>w.slice(0,h).reduce((a,b)=>a+b,0));return cum.map(x=>x/cum[3])}
+function courseFR(course){try{const o=JSON.parse(localStorage.getItem('pc_alloc')||'{}')[ckey(course)];if(o&&o.length==4)return o}catch(e){}return defFR(course)}
 const P={
  parseDur(s){const m=String(s).trim().match(/^(\d+):(\d{1,2})$/);return m?(+m[1])*60+(+m[2]):null},
  fmtDur(m){m=Math.round(m);return Math.floor(m/60)+':'+String(m%60).padStart(2,'0')},
@@ -95,6 +98,7 @@ function render(){const h4=st.act[0]!=null;if(h4was!==null&&h4!==h4was)$('set').
   else h+='<div class="card" data-open="'+i+'"><div class="row"><span>Hole '+n+' by <b>'+P.fmt12(t[i])+'</b></span></div><button class="big" onclick="rec('+i+')">Finished hole '+n+'</button></div>'});
  const sch=P.hm(st.tee);$('atee').innerHTML=st.atee==null?'<div class="card"><div>Scheduled tee '+P.fmt12(sch)+'</div><button class="big" onclick="teeNow()">⛳ First tee shot hit</button></div>':(()=>{const dl=st.atee-sch;return '<details class="card"><summary class="row" style="cursor:pointer;list-style:none"><span>✓ Teed off '+P.fmt12(st.atee)+'</span><span>'+(dl===0?'on time':Math.abs(dl)+' min '+(dl>0?'late':'early'))+'</span></summary><div>Scheduled '+P.fmt12(sch)+' · Actual '+P.fmt12(st.atee)+'</div><button class="sm" onclick="teeEd()">Edit</button><button class="sm" onclick="teeUn()">Undo</button></details>'})();
  {const ww=window.WW||(window.WW=$('wwrap'));document.body.appendChild(ww)}
+ if(typeof allocRender==='function'&&$('allocb'))allocRender();
  $('cps').innerHTML=h;{const ww=window.WW,nx=$('cps').querySelector('[data-open]');if(st.atee!=null&&nx){$('cps').insertBefore(ww,nx);ww.style.display='block'}else if(st.wait&&!nx){$('cps').appendChild(ww);ww.style.display='block'}else ww.style.display='none'}if(typeof doneBox==='function')doneBox();live();
  $('hist').innerHTML=hist.length?'<table><tr><th>Date</th><th>Tee</th><th>Tgt</th><th>4</th><th>9</th><th>13</th><th>18</th></tr>'+hist.slice().reverse().map(r=>'<tr><td>'+r.date+'</td><td>'+r.tee+'</td><td>'+r.tgt+'</td>'+r.delta.map(d=>'<td>'+(d==null?'':((-d||0)>0?'+':'')+(-d||0))+'</td>').join('')+'</tr>').join('')+'</table>':'<p>No saved rounds yet.</p>';
 }
@@ -131,6 +135,19 @@ const c=document.createElement('canvas');c.width=c.height=180;const x=c.getConte
 const icon=new URL('icon.png',location.href).href;
 $('mf').href='data:application/manifest+json,'+encodeURIComponent(JSON.stringify({name:'WPGC Pace Card',short_name:'Pace Card',display:'standalone',background_color:'#0b3d1e',theme_color:'#0b3d1e',start_url:location.href,icons:[{src:icon,sizes:'180x180',type:'image/png'}]}));
 render();setInterval(live,15000);
+function allocRender(){const fr=courseFR(st.course),df=defFR(st.course),k=ckey(st.course),dur=P.parseDur(st.tgt)||250,pars=PARS[k];
+ const pct=fr.map((f,i)=>(f-(i?fr[i-1]:0))*100),dp=df.map((f,i)=>(f-(i?df[i-1]:0))*100);
+ let h='<p style="font-size:14px">Course: <b>'+(k[0].toUpperCase()+k.slice(1))+'</b>'+(pars?' (par 3 = 11, par 4 = 14, par 5 = 17 min weights)':' (Fraserview card)')+'</p><table><tr><th>Holes</th><th>Par</th><th>%</th><th>Min</th><th>Default</th></tr>';
+ SEGS.forEach(([a,b],i)=>{const par=pars?pars.slice(a-1,b).reduce((x,y)=>x+y,0):'';
+  h+='<tr><td>'+(a==1?'Tee':a)+'–'+b+'</td><td>'+par+'</td><td><input data-ai="'+i+'" inputmode="decimal" value="'+pct[i].toFixed(1)+'" style="width:64px;padding:6px;font-size:16px"></td><td>'+P.fmtDur(dur*pct[i]/100)+'</td><td>'+dp[i].toFixed(1)+'%</td></tr>'});
+ const tot=pct.reduce((a,b)=>a+b,0);h+='<tr><td><b>Total</b></td><td>'+(pars?pars.reduce((x,y)=>x+y,0):'')+'</td><td><b>'+tot.toFixed(1)+'%</b></td><td><b>'+P.fmtDur(dur)+'</b></td><td></td></tr></table>';
+ const custom=JSON.stringify(fr.map(x=>x.toFixed(4)))!==JSON.stringify(df.map(x=>x.toFixed(4)));
+ h+='<p style="font-size:14px">'+(custom?'⚙️ Custom allocation in use for this course. ':'Using defaults. ')+'Edit any %; the others stay fixed and all four are rescaled to 100%.</p><button class="sm" id="adef">Reset to defaults</button>';
+ $('allocb').innerHTML=h;
+ $('allocb').querySelectorAll('[data-ai]').forEach(inp=>inp.onchange=()=>{const v=[...$('allocb').querySelectorAll('[data-ai]')].map(x=>Math.max(1,parseFloat(x.value)||0));const s=v.reduce((a,b)=>a+b,0);let c=0;const f=v.map(x=>(c+=x/s));f[3]=1;
+  const o=JSON.parse(localStorage.getItem('pc_alloc')||'{}');o[k]=f;localStorage.setItem('pc_alloc',JSON.stringify(o));render()});
+ $('adef').onclick=()=>{const o=JSON.parse(localStorage.getItem('pc_alloc')||'{}');delete o[k];localStorage.setItem('pc_alloc',JSON.stringify(o));render()}}
+allocRender();
 const RH=['course','group','captain_email','date','sched_tee','actual_tee','tee_delay_min','target','round_time','h4','h9','h13','h18','d4','d9','d13','d18','total_wait_min','wait_count'],WH=['course','date','group','captain_email','sched_tee','actual_tee','wait_no','start','end','wait_mmss','wait_min','stretch','comment'];
 function rowR(r){return [r.course||'',r.grp||'',r.cap||'',r.date,r.tee,r.atee||'',r.tdel==null?'':r.tdel,r.tgt,r.rtime||'',...r.act,...r.delta.map(d=>d==null?'':(-d||0)),wmin((r.waits||[]).reduce((s,w)=>s+w.secs,0)),(r.waits||[]).length]}
 function rowsW(r){return (r.waits||[]).map((w,i)=>[r.course||'',r.date,r.grp||'',r.cap||'',r.tee,r.atee||'',i+1,hhmm(w.start),hhmm(w.end),mss(w.secs),wmin(w.secs),w.stretch||'',w.comment||''])}
