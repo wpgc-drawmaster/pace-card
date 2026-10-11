@@ -44,8 +44,9 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{border-bottom:1px
 <label>Target Round Duration (h:mm)<input id="tgt" inputmode="numeric" value="4:10"></label>
 <label>Scheduled Tee Time<input id="tee" type="time" value="09:54"></label>
 <label>Captain Email (optional)<input id="cap" type="email" placeholder="captain@example.com"></label>
+<div style="margin-top:8px"><button class="sm" id="rst">Reset round</button> <button class="sm" id="clr" style="background:#ffdad6">Clear all history</button></div>
 </details>
-<button class="sm" id="rst">Reset round</button> <button class="sm" id="clr" style="background:#ffdad6">Clear all history</button>
+
 </div>
 <div id="done" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:10;align-items:center;justify-content:center;padding:16px"><div class="card" style="background:#0b3d1e;max-width:420px;width:100%;border:2px solid #fff">
 <h2 style="margin-top:0">🏁 Round Complete</h2><div id="donebody"></div>
