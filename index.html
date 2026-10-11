@@ -33,7 +33,8 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{border-bottom:1px
 </div>
 <div id="cps"></div>
 <h2>History</h2>
-<button class="sm" id="csv">Export CSV</button>
+<label>Also email to (optional)<input id="cc" type="email" placeholder="name@example.com"></label>
+<button class="sm" id="csv">Email CSV</button>
 <div id="hist"></div>
 <script>
 const HOLES=[4,9,13,18],FR=[59/250,125/250,181/250,1];
@@ -72,8 +73,12 @@ $('tgt').onchange=e=>{if(P.parseDur(e.target.value)){st.tgt=e.target.value}save(
 $('now').onclick=()=>{const d=new Date();st.tee=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');st.date=d.toISOString().slice(0,10);save();render()};
 $('newr').onclick=()=>{if(st.act.some(a=>a!=null)){const t=T();hist.push({date:st.date,tee:P.fmt12(P.hm(st.tee)),tgt:st.tgt,act:st.act.map(a=>a==null?'':P.fmt12(a)),delta:st.act.map((a,i)=>a==null?null:Math.round(a-t[i]))})}
  st={date:new Date().toISOString().slice(0,10),tee:st.tee,tgt:st.tgt,act:[null,null,null,null]};save();render()};
-$('csv').onclick=async()=>{const rows=[['date','tee','target','h4','h9','h13','h18','d4','d9','d13','d18']].concat(hist.map(r=>[r.date,r.tee,r.tgt,...r.act,...r.delta.map(d=>d==null?'':d)]));
- const csv=rows.map(r=>r.join(',')).join('\n');try{await navigator.clipboard.writeText(csv);alert('CSV copied to clipboard')}catch(e){const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='pace-history.csv';a.click()}};
+$('cc').value=LS.getItem('pc_cc')||'';$('cc').onchange=e=>LS.setItem('pc_cc',e.target.value.trim());
+$('csv').onclick=()=>{const rows=[['date','tee','target','h4','h9','h13','h18','d4','d9','d13','d18']].concat(hist.map(r=>[r.date,r.tee,r.tgt,...r.act,...r.delta.map(d=>d==null?'':d)]));
+ if(rows.length<2){alert('No saved rounds yet. Tap "Save & new round" first.');return}
+ const csv=rows.map(r=>r.join(',')).join('\n');const cc=$('cc').value.trim();
+ const d=new Date().toISOString().slice(0,10);
+ location.href='mailto:drawmaster.wpgc@gmail.com?'+(cc?'cc='+encodeURIComponent(cc)+'&':'')+'subject='+encodeURIComponent('WPGC Pace Card CSV '+d)+'&body='+encodeURIComponent(csv)};
 // icon + manifest
 const c=document.createElement('canvas');c.width=c.height=180;const x=c.getContext('2d');x.fillStyle='#0b3d1e';x.fillRect(0,0,180,180);x.fillStyle='#fff';x.font='bold 70px sans-serif';x.textAlign='center';x.fillText('4:10',90,115);
 const icon=new URL('icon.png',location.href).href;
