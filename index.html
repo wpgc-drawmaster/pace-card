@@ -15,7 +15,7 @@
 *{box-sizing:border-box}body{margin:0;font-family:-apple-system,system-ui,sans-serif;background:#0b3d1e;color:#fff;padding:env(safe-area-inset-top) 12px 40px;font-size:18px}
 h1{font-size:24px;margin:12px 0}h2{font-size:20px;margin:18px 0 8px}
 #live.y{background:#ffd60a!important;color:#000!important}#live.r{background:#ff3b30!important;color:#fff!important}
-#pace{font-size:34px;font-weight:900;text-align:center;padding:16px 10px;border-radius:14px;margin-bottom:8px;background:#fff;color:#0b3d1e}#pace small{display:block;font-size:15px;font-weight:700}#pace.g{background:#2ecc40;color:#000}#pace.a{background:#ffd60a;color:#000}#pace.r{background:#ff3b30;color:#fff}
+#pace{font-size:34px;font-weight:900;text-align:center;padding:16px 10px;border-radius:14px;margin-bottom:8px;background:#fff;color:#0b3d1e}#pace small{display:block;font-size:15px;font-weight:700}.g{background:#2ecc40;color:#000}.a{background:#ffd60a;color:#000}.r{background:#ff3b30;color:#fff}#pace.g{background:#2ecc40;color:#000}#pace.a{background:#ffd60a;color:#000}#pace.r{background:#ff3b30;color:#fff}
 #live{background:#fff;color:#0b3d1e;font-weight:800;font-size:22px;padding:14px;border-radius:12px;}
 .card{background:#145c2e;border-radius:12px;padding:12px;margin:10px 0}
 label{display:block;font-weight:700;margin:6px 0}input{font-size:22px;padding:10px;border-radius:8px;border:2px solid #fff;width:100%}
@@ -47,6 +47,12 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{border-bottom:1px
 </details>
 <button class="sm" id="newr">Save &amp; new round</button> <button class="sm" id="rst">Reset round</button> <button class="sm" id="clr" style="background:#ffdad6">Clear all history</button>
 </div>
+<div id="done" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:10;align-items:center;justify-content:center;padding:16px"><div class="card" style="background:#0b3d1e;max-width:420px;width:100%;border:2px solid #fff">
+<h2 style="margin-top:0">🏁 Round Complete</h2><div id="donebody"></div>
+<button class="big" id="dsend">Save &amp; Email Round</button>
+<button class="sm" id="dsave">Save only (email later)</button> <button class="sm" id="dlater">Not yet</button>
+</div></div>
+<button class="sm" id="reopen" style="display:none;background:#ffd60a">🏁 Finish round</button>
 <div id="atee"></div>
 <div id="cps"></div>
 <h2>History</h2>
@@ -87,7 +93,7 @@ function render(){const h4=st.act[0]!=null;if(h4was!==null&&h4!==h4was)$('set').
     +'<button class="sm" onclick="ed('+i+')">Edit</button><button class="sm" onclick="un('+i+')">Undo</button></details>'}
   else h+='<div class="card"><div class="row"><span>Hole '+n+' by <b>'+P.fmt12(t[i])+'</b></span></div><button class="big" onclick="rec('+i+')">Finished hole '+n+'</button></div>'});
  const sch=P.hm(st.tee);$('atee').innerHTML=st.atee==null?'<div class="card"><div>Scheduled tee '+P.fmt12(sch)+'</div><button class="big" onclick="teeNow()">⛳ First tee shot hit</button></div>':(()=>{const dl=st.atee-sch;return '<details class="card"><summary class="row" style="cursor:pointer;list-style:none"><span>✓ Teed off '+P.fmt12(st.atee)+'</span><span>'+(dl===0?'on time':Math.abs(dl)+' min '+(dl>0?'late':'early'))+'</span></summary><div>Scheduled '+P.fmt12(sch)+' · Actual '+P.fmt12(st.atee)+'</div><button class="sm" onclick="teeEd()">Edit</button><button class="sm" onclick="teeUn()">Undo</button></details>'})();
- $('cps').innerHTML=h;live();
+ $('cps').innerHTML=h;if(typeof doneBox==='function')doneBox();live();
  $('hist').innerHTML=hist.length?'<table><tr><th>Date</th><th>Tee</th><th>Tgt</th><th>4</th><th>9</th><th>13</th><th>18</th></tr>'+hist.slice().reverse().map(r=>'<tr><td>'+r.date+'</td><td>'+r.tee+'</td><td>'+r.tgt+'</td>'+r.delta.map(d=>'<td>'+(d==null?'':((-d||0)>0?'+':'')+(-d||0))+'</td>').join('')+'</tr>').join('')+'</table>':'<p>No saved rounds yet.</p>';
 }
 function pace(){const t=T(),i=st.act.findIndex(a=>a==null);let last=null,lh=0;st.act.forEach((a,k)=>{if(a!=null){last=-Math.round(a-t[k])||0;lh=HOLES[k]}});
@@ -97,8 +103,8 @@ function pace(){const t=T(),i=st.act.findIndex(a=>a==null);let last=null,lh=0;st
  el.className=v>=0?'g':v>=-5?'a':'r';el.innerHTML=(v===0?'ON PACE':Math.abs(v)+' min '+(v<0?'BEHIND':'AHEAD'))+'<small>'+src+' · target '+st.tgt+'</small>'}
 function live(){pace();const t=T(),i=st.act.findIndex(a=>a==null);if(i<0){const d=-Math.round(st.act[3]-t[3])||0;$('live').className='';$('live').textContent='Round done: '+P.sgn(d)+' vs '+st.tgt;return}
  const rem=t[i]-nowMin(),togo=Math.round(rem);$('live').className=rem<0?'r':rem<=5?'y':'';$('live').textContent='Next: hole '+HOLES[i]+' by '+P.fmt12(t[i])+' — '+(togo>=0?togo+' min to go':(-togo)+' min over')}
-window.rec=i=>{st.act[i]=Math.round(nowMin());save();render()};
-window.un=i=>{st.act[i]=null;save();render()};
+window.rec=i=>{if(i==3)st.dismiss=false;st.act[i]=Math.round(nowMin());save();render()};
+window.un=i=>{st.act[i]=null;if(i==3)st.dismiss=false;save();render()};
 window.ed=i=>{const v=prompt('Finish time (24h HH:MM)',(()=>{const m=st.act[i];return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')})());if(v&&/^\d{1,2}:\d{2}$/.test(v)){st.act[i]=P.hm(v);save();render()}};
 $('dt').value=st.date;$('dt').onchange=e=>{st.date=e.target.value||st.date;save();render()};$('cap').value=st.cap||'';$('cap').onchange=e=>{st.cap=e.target.value.trim();save()};$('course').value=st.course||'';$('grp').value=st.grp||'';$('course').onchange=e=>{st.course=e.target.value.trim();save();render()};$('grp').onchange=e=>{st.grp=e.target.value.trim();save()};
 $('tee').onchange=e=>{st.tee=e.target.value||st.tee;save();render()};
@@ -108,10 +114,12 @@ $('clr').onclick=()=>{if(!confirm('Delete ALL saved rounds and waits on this pho
 window.teeNow=()=>{st.atee=Math.round(nowMin());save();render()};
 window.teeUn=()=>{st.atee=null;save();render()};
 window.teeEd=()=>{const m=st.atee;const v=prompt('Actual tee time (24h HH:MM)',String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0'));if(v&&/^\d{1,2}:\d{2}$/.test(v)){st.atee=P.hm(v);save();render()}};
-$('newr').onclick=()=>{if(st.act.some(a=>a!=null)){const t=T();hist.push({course:st.course||'',grp:st.grp||'',cap:st.cap||'',date:st.date,tee:P.fmt12(P.hm(st.tee)),atee:st.atee!=null?P.fmt12(st.atee):'',tdel:st.atee!=null?st.atee-P.hm(st.tee):'',tgt:st.tgt,act:st.act.map(a=>a==null?'':P.fmt12(a)),delta:st.act.map((a,i)=>a==null?null:Math.round(a-t[i])),waits:(st.waits||[]).slice()})}
- st={date:new Date().toISOString().slice(0,10),tee:st.tee,tgt:st.tgt,act:[null,null,null,null],course:st.course,grp:st.grp,cap:st.cap,waits:[],wait:null,atee:null};save();$('dt').value=st.date;render()};
+function saveRound(){if(!st.act.some(a=>a!=null))return null;const t=T();const base=teeBase();
+ const r={course:st.course||'',grp:st.grp||'',cap:st.cap||'',date:st.date,tee:P.fmt12(P.hm(st.tee)),atee:st.atee!=null?P.fmt12(st.atee):'',tdel:st.atee!=null?st.atee-P.hm(st.tee):'',tgt:st.tgt,act:st.act.map(a=>a==null?'':P.fmt12(a)),delta:st.act.map((a,i)=>a==null?null:Math.round(a-t[i])),waits:(st.waits||[]).slice(),rtime:st.act[3]!=null?P.fmtDur(st.act[3]-base):''};
+ hist.push(r);st={date:new Date().toISOString().slice(0,10),tee:st.tee,tgt:st.tgt,act:[null,null,null,null],course:st.course,grp:st.grp,cap:st.cap,waits:[],wait:null,atee:null};save();$('dt').value=st.date;$('set').open=true;render();wrender();return r}
+$('newr').onclick=()=>saveRound();
 $('cc').value=LS.getItem('pc_cc')||'';$('cc').onchange=e=>LS.setItem('pc_cc',e.target.value.trim());
-$('csv').onclick=()=>{const rows=[['course','group','captain_email','date','sched_tee','actual_tee','tee_delay_min','target','h4','h9','h13','h18','d4','d9','d13','d18','total_wait_min','wait_count']].concat(hist.map(r=>[r.course||'',r.grp||'',r.cap||'',r.date,r.tee,r.atee||'',r.tdel==null?'':r.tdel,r.tgt,...r.act,...r.delta.map(d=>d==null?'':(-d||0)),wmin((r.waits||[]).reduce((s,w)=>s+w.secs,0)),(r.waits||[]).length]));
+$('csv').onclick=()=>{const rows=[RH].concat(hist.map(rowR));
  if(rows.length<2){alert('No saved rounds yet. Tap "Save & new round" first.');return}
  const q=v=>{v=String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};const csv=rows.map(r=>r.map(q).join(',')).join('\n');const lastCap=(hist[hist.length-1]||{}).cap||'';const cc=[lastCap,$('cc').value.trim()].filter(Boolean).join(',');
  const d=new Date().toISOString().slice(0,10);
@@ -121,6 +129,25 @@ const c=document.createElement('canvas');c.width=c.height=180;const x=c.getConte
 const icon=new URL('icon.png',location.href).href;
 $('mf').href='data:application/manifest+json,'+encodeURIComponent(JSON.stringify({name:'WPGC Pace Card',short_name:'Pace Card',display:'standalone',background_color:'#0b3d1e',theme_color:'#0b3d1e',start_url:location.href,icons:[{src:icon,sizes:'180x180',type:'image/png'}]}));
 render();setInterval(live,15000);
+const RH=['course','group','captain_email','date','sched_tee','actual_tee','tee_delay_min','target','round_time','h4','h9','h13','h18','d4','d9','d13','d18','total_wait_min','wait_count'],WH=['course','date','group','captain_email','sched_tee','actual_tee','wait_no','start','end','wait_mmss','wait_min','stretch','comment'];
+function rowR(r){return [r.course||'',r.grp||'',r.cap||'',r.date,r.tee,r.atee||'',r.tdel==null?'':r.tdel,r.tgt,r.rtime||'',...r.act,...r.delta.map(d=>d==null?'':(-d||0)),wmin((r.waits||[]).reduce((s,w)=>s+w.secs,0)),(r.waits||[]).length]}
+function rowsW(r){return (r.waits||[]).map((w,i)=>[r.course||'',r.date,r.grp||'',r.cap||'',r.tee,r.atee||'',i+1,hhmm(w.start),hhmm(w.end),mss(w.secs),wmin(w.secs),w.stretch||'',w.comment||''])}
+const toCSV=rows=>rows.map(r=>r.map(qv).join(',')).join('\n');
+function doneBox(){const box=$('done');if(st.act[3]==null||st.dismiss){box.style.display='none';$('reopen').style.display=st.act[3]!=null?'inline-block':'none';return}
+ $('reopen').style.display='none';const t=T(),d=-Math.round(st.act[3]-t[3])||0,rt=st.act[3]-teeBase(),ws=st.waits||[],tw=ws.reduce((s,w)=>s+w.secs,0);
+ $('donebody').innerHTML='<div style="font-size:30px;font-weight:900;text-align:center;padding:10px;border-radius:12px" class="'+(d>=0?'g':d>=-5?'a':'r')+'">'+(d===0?'ON PACE':Math.abs(d)+' min '+(d<0?'BEHIND':'AHEAD'))+'</div>'
+  +'<p>'+[st.course,st.grp,st.date].filter(Boolean).join(' · ')+'</p>'
+  +'<p>Round time <b>'+P.fmtDur(rt)+'</b> vs target <b>'+st.tgt+'</b></p>'
+  +'<p>Teed off <b>'+P.fmt12(teeBase())+'</b>'+(st.atee!=null?' (scheduled '+P.fmt12(P.hm(st.tee))+')':' (scheduled time, tee shot not tapped)')+'</p>'
+  +'<p>Waits <b>'+ws.length+'</b> · total <b>'+mss(tw)+'</b>'+(st.wait?' <i>(a wait is still running and will be stopped)</i>':'')+'</p>';
+ box.style.display='flex'}
+$('dsend').onclick=()=>{if(st.wait)$('wbtn').onclick();const r=saveRound();if(!r)return;
+ const body='ROUND\n'+toCSV([RH,rowR(r)])+'\n\nWAITS\n'+(r.waits.length?toCSV([WH].concat(rowsW(r))):'none');
+ mail('WPGC Pace Round '+[r.course,r.grp,r.date].filter(Boolean).join(' - '),body)};
+$('dsave').onclick=()=>{if(st.wait)$('wbtn').onclick();saveRound()};
+$('dlater').onclick=()=>{st.dismiss=true;save();doneBox()};
+$('reopen').onclick=()=>{st.dismiss=false;save();doneBox()};
+
 function wmin(s){return (s/60).toFixed(1)}
 function mss(s){s=Math.round(s);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
 function qv(v){v=String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
@@ -140,8 +167,7 @@ function wrender(){const on=!!st.wait;$('wbtn').className=on?'on':'';$('wbox').s
  $('wbtn').textContent=on?'■ Stop Wait  '+mss((Date.now()-st.wait.start)/1000):'⏸ Start Wait';
  const ws=st.waits||[];const tot=ws.reduce((s,w)=>s+w.secs,0);
  $('wlist').innerHTML=ws.length?'<details class="card"><summary style="font-weight:800;cursor:pointer">Waits this round: '+ws.length+' · total '+mss(tot)+'</summary>'+ws.map((w,i)=>'<div class="row" style="margin-top:6px"><span>'+hhmm(w.start)+' · <b>'+mss(w.secs)+'</b> · '+(w.comment||'<i>no comment</i>')+'</span><span><button class="chip" onclick="wedit('+i+')">Edit</button><button class="chip" onclick="wdel('+i+')">✕</button></span></div>').join('')+'</details>':''}
-$('wcsv').onclick=()=>{const rows=[['course','date','group','captain_email','sched_tee','actual_tee','wait_no','start','end','wait_mmss','wait_min','stretch','comment']];
- hist.forEach(r=>(r.waits||[]).forEach((w,i)=>rows.push([r.course||'',r.date,r.grp||'',r.cap||'',r.tee,r.atee||'',i+1,hhmm(w.start),hhmm(w.end),mss(w.secs),wmin(w.secs),w.stretch||'',w.comment||''])));
+$('wcsv').onclick=()=>{const rows=[WH];hist.forEach(r=>rowsW(r).forEach(x=>rows.push(x)));
  if(rows.length<2){alert('No waits in saved rounds yet. Tap "Save & new round" first.');return}
  mail('WPGC Wait Log CSV '+new Date().toISOString().slice(0,10),rows.map(r=>r.map(qv).join(',')).join('\n'))};
 setInterval(()=>{if(st.wait)wrender()},1000);
