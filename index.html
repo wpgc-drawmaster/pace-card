@@ -52,15 +52,15 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{border-bottom:1px
 </div>
 <div id="done" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:10;align-items:center;justify-content:center;padding:16px"><div class="card" style="background:#0b3d1e;max-width:420px;width:100%;border:2px solid #fff">
 <h2 style="margin-top:0">🏁 Round Complete</h2><div id="donebody"></div>
-<button class="big" id="dsend">Save &amp; Email Round</button>
+<button class="big" id="dsend">Save &amp; Share Round CSV</button>
 <button class="sm" id="dsave">Save only (email later)</button> <button class="sm" id="dlater">Not yet</button>
 </div></div>
 <button class="sm" id="reopen" style="display:none;background:#ffd60a">🏁 Finish round</button>
 <div id="atee"></div>
 <div id="cps"></div>
 <h2>History</h2>
-<label>Also email to (optional)<input id="cc" type="email" placeholder="name@example.com"></label>
-<button class="sm" id="csv">Email CSV</button> <button class="sm" id="wcsv">Email Wait Log CSV</button>
+<button class="sm" id="csv">Share Rounds CSV</button> <button class="sm" id="wcsv">Share Wait Log CSV</button>
+<p style="font-size:14px;opacity:.85">Opens the iPhone Share sheet. Tap Mail and send to drawmaster.wpgc@gmail.com.</p>
 <div id="hist"></div>
 <script>
 const HOLES=[4,9,13,18],SEGS=[[1,4],[5,9],[10,13],[14,18]];
@@ -118,7 +118,7 @@ $('dt').value=st.date;$('dt').onchange=e=>{st.date=e.target.value||st.date;save(
 $('tee').onchange=e=>{st.tee=e.target.value;save();render()};
 $('tgt').onchange=e=>{if(P.parseDur(e.target.value)){st.tgt=e.target.value}save();render()};
 $('rst').onclick=()=>{if(!confirm('Reset this round? Clears Course, Group Name, Target Round Duration, Scheduled Tee Time, the tee shot, all checkpoint times and waits. Saved history is kept.'))return;st={date:new Date().toISOString().slice(0,10),tee:'',tgt:'',course:'',grp:'',cap:st.cap||'',act:[null,null,null,null],atee:null,waits:[],wait:null};save();$('dt').value=st.date;render();wrender()};
-$('clr').onclick=()=>{if(!confirm('Delete ALL saved rounds and waits on this phone? Email the CSVs first if you need them.'))return;if(!confirm('Are you sure? This cannot be undone.'))return;hist=[];save();render()};
+$('clr').onclick=()=>{if(!confirm('Delete ALL saved rounds and waits on this phone? Share the CSVs first if you need them.'))return;if(!confirm('Are you sure? This cannot be undone.'))return;hist=[];save();render()};
 window.teeNow=()=>{st.atee=Math.round(nowMin());save();render()};
 window.teeUn=()=>{st.atee=null;save();render()};
 window.teeEd=()=>{const m=st.atee;const v=prompt('Actual tee time (24h HH:MM)',String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0'));if(v&&/^\d{1,2}:\d{2}$/.test(v)){st.atee=P.hm(v);save();render()}};
@@ -126,12 +126,11 @@ function saveRound(){if(!st.act.some(a=>a!=null))return null;const t=T();const b
  const r={course:st.course||'',grp:st.grp||'',cap:st.cap||'',date:st.date,tee:P.fmt12(P.hm(st.tee)),atee:st.atee!=null?P.fmt12(st.atee):'',tdel:st.atee!=null?st.atee-P.hm(st.tee):'',tgt:st.tgt,act:st.act.map(a=>a==null?'':P.fmt12(a)),delta:st.act.map((a,i)=>a==null?null:Math.round(a-t[i])),waits:(st.waits||[]).slice(),rtime:st.act[3]!=null?P.fmtDur(st.act[3]-base):''};
  hist.push(r);st={date:new Date().toISOString().slice(0,10),tee:st.tee,tgt:st.tgt,act:[null,null,null,null],course:st.course,grp:st.grp,cap:st.cap,waits:[],wait:null,atee:null};save();$('dt').value=st.date;$('set').open=true;render();wrender();return r}
 
-$('cc').value=LS.getItem('pc_cc')||'';$('cc').onchange=e=>LS.setItem('pc_cc',e.target.value.trim());
 $('csv').onclick=()=>{const rows=[RH].concat(hist.map(rowR));
  if(rows.length<2){alert('No saved rounds yet. Finish a round first.');return}
- const q=v=>{v=String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};const csv=rows.map(r=>r.map(q).join(',')).join('\n');const lastCap=(hist[hist.length-1]||{}).cap||'';const cc=[lastCap,$('cc').value.trim()].filter(Boolean).join(',');
+ const q=v=>{v=String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};const csv=rows.map(r=>r.map(q).join(',')).join('\n');
  const d=new Date().toISOString().slice(0,10);
- mail('WPGC Pace Card CSV '+d,csv)};
+ shareFiles([['wpgc-pace-rounds-'+d+'.csv',csv]],'WPGC Pace Rounds '+d)};
 // icon + manifest
 const c=document.createElement('canvas');c.width=c.height=180;const x=c.getContext('2d');x.fillStyle='#0b3d1e';x.fillRect(0,0,180,180);x.fillStyle='#fff';x.font='bold 70px sans-serif';x.textAlign='center';x.fillText('4:10',90,115);
 const icon=new URL('icon.png',location.href).href;
@@ -163,8 +162,8 @@ function doneBox(){const box=$('done');if(st.act[3]==null||st.dismiss){box.style
   +'<p>Waits <b>'+ws.length+'</b> · total <b>'+mss(tw)+'</b>'+(st.wait?' <i>(a wait is still running and will be stopped)</i>':'')+'</p>';
  box.style.display='flex'}
 $('dsend').onclick=()=>{if(st.wait)$('wbtn').onclick();const r=saveRound();if(!r)return;
- const body='ROUND\n'+toCSV([RH,rowR(r)])+'\n\nWAITS\n'+(r.waits.length?toCSV([WH].concat(rowsW(r))):'none');
- mail('WPGC Pace Round '+[r.course,r.grp,r.date].filter(Boolean).join(' - '),body)};
+ const tag=fslug([r.date,r.course,r.grp]);const f=[['wpgc-pace-round-'+tag+'.csv',toCSV([RH,rowR(r)])]];if(r.waits.length)f.push(['wpgc-wait-log-'+tag+'.csv',toCSV([WH].concat(rowsW(r)))]);
+ shareFiles(f,'WPGC Pace Round '+[r.course,r.grp,r.date].filter(Boolean).join(' - '))};
 $('dsave').onclick=()=>{if(st.wait)$('wbtn').onclick();saveRound()};
 $('dlater').onclick=()=>{st.dismiss=true;save();doneBox()};
 $('reopen').onclick=()=>{st.dismiss=false;save();doneBox()};
@@ -172,8 +171,10 @@ $('reopen').onclick=()=>{st.dismiss=false;save();doneBox()};
 function wmin(s){return (s/60).toFixed(1)}
 function mss(s){s=Math.round(s);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
 function qv(v){v=String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
-function mail(subj,body){const lastCap=(hist[hist.length-1]||{}).cap||st.cap||'';const cc=[lastCap,$('cc').value.trim()].filter(Boolean).join(',');
- location.href='mailto:drawmaster.wpgc@gmail.com?'+(cc?'cc='+encodeURIComponent(cc)+'&':'')+'subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(body)}
+const fslug=a=>a.filter(Boolean).join('-').replace(/[^A-Za-z0-9-]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
+async function shareFiles(list,title){const files=list.map(([n,c])=>new File([c],n,{type:'text/csv'}));
+ try{if(navigator.canShare&&navigator.canShare({files})){await navigator.share({files,title,text:title});return}}catch(e){if(e&&e.name==='AbortError')return}
+ list.forEach(([n,c])=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:'text/csv'}));a.download=n;document.body.appendChild(a);a.click();a.remove()})}
 const hhmm=ms=>{const d=new Date(ms);return P.fmt12(d.getHours()*60+d.getMinutes())};
 function stretch(){const i=st.act.findIndex(a=>a==null);return i<0?'after 18':i==0?'holes 1-4':'holes '+(HOLES[i-1]+1)+'-'+HOLES[i]}
 ['Teebox ','Fairway, waiting for green','Par 3 tee'].forEach(c=>{const b=document.createElement('button');b.className='chip';b.textContent=c.trim();b.onclick=()=>{$('wcom').value=c;$('wcom').focus();if(st.wait){st.wait.comment=c;save()}};$('chips').appendChild(b)});
@@ -190,7 +191,7 @@ function wrender(){const on=!!st.wait;$('wbtn').className=on?'on':'';$('wbox').s
  $('wlist').innerHTML=ws.length?'<details class="card"><summary style="font-weight:800;cursor:pointer">Waits this round: '+ws.length+' · total '+mss(tot)+'</summary>'+ws.map((w,i)=>'<div class="wrow"><div class="wtxt"><div><b>'+mss(w.secs)+'</b> <span class="wt">at '+hhmm(w.start)+'</span></div><div class="wc">'+(w.comment||'<i>no comment</i>')+'</div></div><div class="wbtns"><button class="wb" onclick="wedit('+i+')" aria-label="Edit">✎</button><button class="wb" onclick="wdel('+i+')" aria-label="Delete">✕</button></div></div>').join('')+'</details>':''}
 $('wcsv').onclick=()=>{const rows=[WH];hist.forEach(r=>rowsW(r).forEach(x=>rows.push(x)));
  if(rows.length<2){alert('No waits in saved rounds yet. Finish a round first.');return}
- mail('WPGC Wait Log CSV '+new Date().toISOString().slice(0,10),rows.map(r=>r.map(qv).join(',')).join('\n'))};
+ const d=new Date().toISOString().slice(0,10);shareFiles([['wpgc-wait-log-'+d+'.csv',toCSV(rows)]],'WPGC Wait Log '+d)};
 setInterval(()=>{if(st.wait)wrender()},1000);
 wrender();
 }
