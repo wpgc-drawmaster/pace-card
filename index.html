@@ -45,7 +45,7 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{border-bottom:1px
 <label>Scheduled Tee Time<input id="tee" type="time" value="09:54"></label>
 <label>Captain Email (optional)<input id="cap" type="email" placeholder="captain@example.com"></label>
 </details>
-<button class="sm" id="newr">Save &amp; new round</button> <button class="sm" id="rst">Reset round</button> <button class="sm" id="clr" style="background:#ffdad6">Clear all history</button>
+<button class="sm" id="rst">Reset round</button> <button class="sm" id="clr" style="background:#ffdad6">Clear all history</button>
 </div>
 <div id="done" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:10;align-items:center;justify-content:center;padding:16px"><div class="card" style="background:#0b3d1e;max-width:420px;width:100%;border:2px solid #fff">
 <h2 style="margin-top:0">🏁 Round Complete</h2><div id="donebody"></div>
@@ -117,10 +117,10 @@ window.teeEd=()=>{const m=st.atee;const v=prompt('Actual tee time (24h HH:MM)',S
 function saveRound(){if(!st.act.some(a=>a!=null))return null;const t=T();const base=teeBase();
  const r={course:st.course||'',grp:st.grp||'',cap:st.cap||'',date:st.date,tee:P.fmt12(P.hm(st.tee)),atee:st.atee!=null?P.fmt12(st.atee):'',tdel:st.atee!=null?st.atee-P.hm(st.tee):'',tgt:st.tgt,act:st.act.map(a=>a==null?'':P.fmt12(a)),delta:st.act.map((a,i)=>a==null?null:Math.round(a-t[i])),waits:(st.waits||[]).slice(),rtime:st.act[3]!=null?P.fmtDur(st.act[3]-base):''};
  hist.push(r);st={date:new Date().toISOString().slice(0,10),tee:st.tee,tgt:st.tgt,act:[null,null,null,null],course:st.course,grp:st.grp,cap:st.cap,waits:[],wait:null,atee:null};save();$('dt').value=st.date;$('set').open=true;render();wrender();return r}
-$('newr').onclick=()=>saveRound();
+
 $('cc').value=LS.getItem('pc_cc')||'';$('cc').onchange=e=>LS.setItem('pc_cc',e.target.value.trim());
 $('csv').onclick=()=>{const rows=[RH].concat(hist.map(rowR));
- if(rows.length<2){alert('No saved rounds yet. Tap "Save & new round" first.');return}
+ if(rows.length<2){alert('No saved rounds yet. Finish a round first.');return}
  const q=v=>{v=String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};const csv=rows.map(r=>r.map(q).join(',')).join('\n');const lastCap=(hist[hist.length-1]||{}).cap||'';const cc=[lastCap,$('cc').value.trim()].filter(Boolean).join(',');
  const d=new Date().toISOString().slice(0,10);
  mail('WPGC Pace Card CSV '+d,csv)};
@@ -168,7 +168,7 @@ function wrender(){const on=!!st.wait;$('wbtn').className=on?'on':'';$('wbox').s
  const ws=st.waits||[];const tot=ws.reduce((s,w)=>s+w.secs,0);
  $('wlist').innerHTML=ws.length?'<details class="card"><summary style="font-weight:800;cursor:pointer">Waits this round: '+ws.length+' · total '+mss(tot)+'</summary>'+ws.map((w,i)=>'<div class="row" style="margin-top:6px"><span>'+hhmm(w.start)+' · <b>'+mss(w.secs)+'</b> · '+(w.comment||'<i>no comment</i>')+'</span><span><button class="chip" onclick="wedit('+i+')">Edit</button><button class="chip" onclick="wdel('+i+')">✕</button></span></div>').join('')+'</details>':''}
 $('wcsv').onclick=()=>{const rows=[WH];hist.forEach(r=>rowsW(r).forEach(x=>rows.push(x)));
- if(rows.length<2){alert('No waits in saved rounds yet. Tap "Save & new round" first.');return}
+ if(rows.length<2){alert('No waits in saved rounds yet. Finish a round first.');return}
  mail('WPGC Wait Log CSV '+new Date().toISOString().slice(0,10),rows.map(r=>r.map(qv).join(',')).join('\n'))};
 setInterval(()=>{if(st.wait)wrender()},1000);
 wrender();
