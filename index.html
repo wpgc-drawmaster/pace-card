@@ -39,13 +39,13 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{border-bottom:1px
 <div class="card">
 <details id="set" open><summary id="sum" style="font-weight:800;cursor:pointer;padding:6px 0">Setup Round</summary>
 <label>Date<input id="dt" type="date"></label>
-<label>Course<input id="course" placeholder="e.g. Langara"></label>
+<label>Course<input id="course" list="courses" placeholder="Fraserview, Langara or McCleery"><datalist id="courses"><option value="Fraserview"><option value="Langara"><option value="McCleery"></datalist></label>
 <label>Group Name<input id="grp" placeholder="e.g. Group 7"></label>
 <label>Target Round Duration (h:mm)<input id="tgt" inputmode="numeric" value="4:10"></label>
 <label>Scheduled Tee Time<input id="tee" type="time" value="09:54"></label>
 <label>Captain Email (optional)<input id="cap" type="email" placeholder="captain@example.com"></label>
 </details>
-<button class="sm" id="newr">Save &amp; new round</button>
+<button class="sm" id="newr">Save &amp; new round</button> <button class="sm" id="rst">Reset round</button> <button class="sm" id="clr" style="background:#ffdad6">Clear all history</button>
 </div>
 <div id="atee"></div>
 <div id="cps"></div>
@@ -54,13 +54,17 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{border-bottom:1px
 <button class="sm" id="csv">Email CSV</button> <button class="sm" id="wcsv">Email Wait Log CSV</button>
 <div id="hist"></div>
 <script>
-const HOLES=[4,9,13,18],FR=[59/250,125/250,181/250,1];
+const HOLES=[4,9,13,18];
+const PARS={langara:[4,3,5,4,4,4,4,3,4,4,5,3,4,3,4,5,4,4],mccleery:[5,4,3,4,3,4,3,4,5,4,5,4,3,5,4,3,4,4]};
+const W={3:11,4:14,5:17};
+function courseFR(course){const c=(course||'').toLowerCase();const k=Object.keys(PARS).find(k=>c.includes(k));if(!k)return [59/250,125/250,181/250,1];
+ const w=PARS[k].map(p=>W[p]);const cum=HOLES.map(h=>w.slice(0,h).reduce((a,b)=>a+b,0));return cum.map(x=>x/cum[3])}
 const P={
  parseDur(s){const m=String(s).trim().match(/^(\d+):(\d{1,2})$/);return m?(+m[1])*60+(+m[2]):null},
  fmtDur(m){m=Math.round(m);return Math.floor(m/60)+':'+String(m%60).padStart(2,'0')},
  fmt12(min){min=((Math.round(min)%1440)+1440)%1440;let h=Math.floor(min/60),mm=min%60;const ap=h<12?'am':'pm';h=h%12||12;return h+':'+String(mm).padStart(2,'0')+ap},
  hm(s){const[a,b]=s.split(':');return +a*60+ +b},
- targets(tee,dur){return FR.map(f=>tee+Math.round(dur*f))},
+ targets(tee,dur,course){return courseFR(course).map(f=>tee+Math.round(dur*f))},
  cls(d){return d<=2?'g':d<=5?'a':'r'},
  sgn(d){return (d>0?'+':d<0?'−':'±')+Math.abs(d)+' min'}
 };
@@ -71,7 +75,7 @@ let st=JSON.parse(LS.getItem('pc_cur')||'null')||{date:new Date().toISOString().
 let hist=JSON.parse(LS.getItem('pc_hist')||'[]');
 const save=()=>{LS.setItem('pc_cur',JSON.stringify(st));LS.setItem('pc_hist',JSON.stringify(hist))};
 const nowMin=()=>{const d=new Date();return d.getHours()*60+d.getMinutes()+d.getSeconds()/60};
-const teeBase=()=>st.atee!=null?st.atee:P.hm(st.tee);const T=()=>P.targets(teeBase(),P.parseDur(st.tgt)||250);
+const teeBase=()=>st.atee!=null?st.atee:P.hm(st.tee);const T=()=>P.targets(teeBase(),P.parseDur(st.tgt)||250,st.course);
 let h4was=null;const openCp=new Set();document.addEventListener('toggle',e=>{const el=e.target;if(el.classList&&el.classList.contains('cp')){const i=+el.dataset.i;el.open?openCp.add(i):openCp.delete(i)}},true);
 function render(){const h4=st.act[0]!=null;if(h4was!==null&&h4!==h4was)$('set').open=!h4;if(h4was===null)$('set').open=!h4;h4was=h4;$('sum').textContent='Setup Round: '+[st.course,st.grp].filter(Boolean).join(', ')+(st.course||st.grp?' · ':'')+st.tgt+' target, tee '+P.fmt12(P.hm(st.tee));
  $('tee').value=st.tee;$('tgt').value=st.tgt;const t=T();let h='';
@@ -96,9 +100,11 @@ function live(){pace();const t=T(),i=st.act.findIndex(a=>a==null);if(i<0){const 
 window.rec=i=>{st.act[i]=Math.round(nowMin());save();render()};
 window.un=i=>{st.act[i]=null;save();render()};
 window.ed=i=>{const v=prompt('Finish time (24h HH:MM)',(()=>{const m=st.act[i];return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')})());if(v&&/^\d{1,2}:\d{2}$/.test(v)){st.act[i]=P.hm(v);save();render()}};
-$('dt').value=st.date;$('dt').onchange=e=>{st.date=e.target.value||st.date;save();render()};$('cap').value=st.cap||'';$('cap').onchange=e=>{st.cap=e.target.value.trim();save()};$('course').value=st.course||'';$('grp').value=st.grp||'';$('course').onchange=e=>{st.course=e.target.value.trim();save()};$('grp').onchange=e=>{st.grp=e.target.value.trim();save()};
+$('dt').value=st.date;$('dt').onchange=e=>{st.date=e.target.value||st.date;save();render()};$('cap').value=st.cap||'';$('cap').onchange=e=>{st.cap=e.target.value.trim();save()};$('course').value=st.course||'';$('grp').value=st.grp||'';$('course').onchange=e=>{st.course=e.target.value.trim();save();render()};$('grp').onchange=e=>{st.grp=e.target.value.trim();save()};
 $('tee').onchange=e=>{st.tee=e.target.value||st.tee;save();render()};
 $('tgt').onchange=e=>{if(P.parseDur(e.target.value)){st.tgt=e.target.value}save();render()};
+$('rst').onclick=()=>{if(!confirm('Reset this round? Clears the tee shot, all checkpoint times and waits. Setup info is kept.'))return;st.act=[null,null,null,null];st.atee=null;st.waits=[];st.wait=null;save();$('set').open=true;render();wrender()};
+$('clr').onclick=()=>{if(!confirm('Delete ALL saved rounds and waits on this phone? Email the CSVs first if you need them.'))return;if(!confirm('Are you sure? This cannot be undone.'))return;hist=[];save();render()};
 window.teeNow=()=>{st.atee=Math.round(nowMin());save();render()};
 window.teeUn=()=>{st.atee=null;save();render()};
 window.teeEd=()=>{const m=st.atee;const v=prompt('Actual tee time (24h HH:MM)',String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0'));if(v&&/^\d{1,2}:\d{2}$/.test(v)){st.atee=P.hm(v);save();render()}};
