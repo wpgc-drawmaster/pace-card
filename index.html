@@ -30,11 +30,11 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{border-bottom:1px
 </style></head><body>
 <h1 style="display:flex;align-items:center;gap:10px"><img src="logo.png" alt="WPGC" style="width:44px;height:44px;border-radius:50%">WPGC Pace Card</h1>
 <div style="position:sticky;top:0;z-index:3;background:#0b3d1e;padding-bottom:6px"><div id="pace">—</div><div id="live">—</div></div>
-<button id="wbtn">⏸ Start Wait</button>
+<div id="wwrap" style="display:none"><button id="wbtn">⏸ Start Wait</button>
 <div id="wbox" class="card" style="display:none">
 <label>Wait comment<input id="wcom" placeholder="e.g. Teebox 3"></label>
 <div id="chips"></div>
-</div>
+</div></div>
 <div id="wlist"></div>
 <div class="card">
 <details id="set" open><summary id="sum" style="font-weight:800;cursor:pointer;padding:6px 0">Setup Round</summary>
@@ -91,9 +91,10 @@ function render(){const h4=st.act[0]!=null;if(h4was!==null&&h4!==h4was)$('set').
     +'<div>Target '+P.fmt12(t[i])+' · Finished '+P.fmt12(a)+'</div>'
     +'<div>This stretch: <b>'+P.sgn(seg)+'</b> · Round total: <b>'+P.sgn(d)+'</b></div>'
     +'<button class="sm" onclick="ed('+i+')">Edit</button><button class="sm" onclick="un('+i+')">Undo</button></details>'}
-  else h+='<div class="card"><div class="row"><span>Hole '+n+' by <b>'+P.fmt12(t[i])+'</b></span></div><button class="big" onclick="rec('+i+')">Finished hole '+n+'</button></div>'});
+  else h+='<div class="card" data-open="'+i+'"><div class="row"><span>Hole '+n+' by <b>'+P.fmt12(t[i])+'</b></span></div><button class="big" onclick="rec('+i+')">Finished hole '+n+'</button></div>'});
  const sch=P.hm(st.tee);$('atee').innerHTML=st.atee==null?'<div class="card"><div>Scheduled tee '+P.fmt12(sch)+'</div><button class="big" onclick="teeNow()">⛳ First tee shot hit</button></div>':(()=>{const dl=st.atee-sch;return '<details class="card"><summary class="row" style="cursor:pointer;list-style:none"><span>✓ Teed off '+P.fmt12(st.atee)+'</span><span>'+(dl===0?'on time':Math.abs(dl)+' min '+(dl>0?'late':'early'))+'</span></summary><div>Scheduled '+P.fmt12(sch)+' · Actual '+P.fmt12(st.atee)+'</div><button class="sm" onclick="teeEd()">Edit</button><button class="sm" onclick="teeUn()">Undo</button></details>'})();
- $('cps').innerHTML=h;if(typeof doneBox==='function')doneBox();live();
+ {const ww=window.WW||(window.WW=$('wwrap'));document.body.appendChild(ww)}
+ $('cps').innerHTML=h;{const ww=window.WW,nx=$('cps').querySelector('[data-open]');if(st.atee!=null&&nx){$('cps').insertBefore(ww,nx);ww.style.display='block'}else if(st.wait&&!nx){$('cps').appendChild(ww);ww.style.display='block'}else ww.style.display='none'}if(typeof doneBox==='function')doneBox();live();
  $('hist').innerHTML=hist.length?'<table><tr><th>Date</th><th>Tee</th><th>Tgt</th><th>4</th><th>9</th><th>13</th><th>18</th></tr>'+hist.slice().reverse().map(r=>'<tr><td>'+r.date+'</td><td>'+r.tee+'</td><td>'+r.tgt+'</td>'+r.delta.map(d=>'<td>'+(d==null?'':((-d||0)>0?'+':'')+(-d||0))+'</td>').join('')+'</tr>').join('')+'</table>':'<p>No saved rounds yet.</p>';
 }
 function pace(){const t=T(),i=st.act.findIndex(a=>a==null);let last=null,lh=0;st.act.forEach((a,k)=>{if(a!=null){last=-Math.round(a-t[k])||0;lh=HOLES[k]}});
