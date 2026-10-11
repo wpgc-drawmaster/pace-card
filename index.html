@@ -14,6 +14,7 @@
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:-apple-system,system-ui,sans-serif;background:#0b3d1e;color:#fff;padding:env(safe-area-inset-top) 12px 40px;font-size:18px}
 h1{font-size:24px;margin:12px 0}h2{font-size:20px;margin:18px 0 8px}
+#live.y{background:#ffd60a!important;color:#000!important}#live.r{background:#ff3b30!important;color:#fff!important}
 #live{background:#fff;color:#0b3d1e;font-weight:800;font-size:22px;padding:14px;border-radius:12px;position:sticky;top:0;z-index:2}
 .card{background:#145c2e;border-radius:12px;padding:12px;margin:10px 0}
 label{display:block;font-weight:700;margin:6px 0}input{font-size:22px;padding:10px;border-radius:8px;border:2px solid #fff;width:100%}
@@ -63,8 +64,8 @@ function render(){
  $('cps').innerHTML=h;live();
  $('hist').innerHTML=hist.length?'<table><tr><th>Date</th><th>Tee</th><th>Tgt</th><th>4</th><th>9</th><th>13</th><th>18</th></tr>'+hist.slice().reverse().map(r=>'<tr><td>'+r.date+'</td><td>'+r.tee+'</td><td>'+r.tgt+'</td>'+r.delta.map(d=>'<td>'+(d==null?'':(d>0?'+':'')+d)+'</td>').join('')+'</tr>').join('')+'</table>':'<p>No saved rounds yet.</p>';
 }
-function live(){const t=T(),i=st.act.findIndex(a=>a==null);if(i<0){const d=Math.round(st.act[3]-t[3]);$('live').textContent='Round done: '+P.sgn(d)+' vs '+st.tgt;return}
- const togo=Math.round(t[i]-nowMin());$('live').textContent='Next: hole '+HOLES[i]+' by '+P.fmt12(t[i])+' — '+(togo>=0?togo+' min to go':(-togo)+' min over')}
+function live(){const t=T(),i=st.act.findIndex(a=>a==null);if(i<0){const d=Math.round(st.act[3]-t[3]);$('live').className='';$('live').textContent='Round done: '+P.sgn(d)+' vs '+st.tgt;return}
+ const rem=t[i]-nowMin(),togo=Math.round(rem);$('live').className=rem<0?'r':rem<=5?'y':'';$('live').textContent='Next: hole '+HOLES[i]+' by '+P.fmt12(t[i])+' — '+(togo>=0?togo+' min to go':(-togo)+' min over')}
 window.rec=i=>{st.act[i]=Math.round(nowMin());save();render()};
 window.un=i=>{st.act[i]=null;save();render()};
 window.ed=i=>{const v=prompt('Finish time (24h HH:MM)',(()=>{const m=st.act[i];return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')})());if(v&&/^\d{1,2}:\d{2}$/.test(v)){st.act[i]=P.hm(v);save();render()}};
