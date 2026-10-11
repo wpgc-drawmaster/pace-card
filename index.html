@@ -62,12 +62,16 @@ let hist=JSON.parse(LS.getItem('pc_hist')||'[]');
 const save=()=>{LS.setItem('pc_cur',JSON.stringify(st));LS.setItem('pc_hist',JSON.stringify(hist))};
 const nowMin=()=>{const d=new Date();return d.getHours()*60+d.getMinutes()+d.getSeconds()/60};
 const T=()=>P.targets(P.hm(st.tee),P.parseDur(st.tgt)||250);
-let h4was=null;
+let h4was=null;const openCp=new Set();document.addEventListener('toggle',e=>{const el=e.target;if(el.classList&&el.classList.contains('cp')){const i=+el.dataset.i;el.open?openCp.add(i):openCp.delete(i)}},true);
 function render(){const h4=st.act[0]!=null;if(h4was!==null&&h4!==h4was)$('set').open=!h4;if(h4was===null)$('set').open=!h4;h4was=h4;$('sum').textContent='Setup Round: '+[st.course,st.grp].filter(Boolean).join(', ')+(st.course||st.grp?' · ':'')+st.tgt+' target, tee '+P.fmt12(P.hm(st.tee));
  $('tee').value=st.tee;$('tgt').value=st.tgt;const t=T();let h='';
- HOLES.forEach((n,i)=>{const a=st.act[i];h+='<div class="card"><div class="row"><span>Hole '+n+' by <b>'+P.fmt12(t[i])+'</b></span>';
-  if(a!=null){const d=-Math.round(a-t[i])||0;h+='<span class="d '+P.cls(-d)+'">'+P.sgn(d)+'</span></div><div>Finished '+P.fmt12(a)+'</div><button class="sm" onclick="ed('+i+')">Edit</button><button class="sm" onclick="un('+i+')">Undo</button>'}
-  else h+='</div><button class="big" onclick="rec('+i+')">Finished hole '+n+'</button>';h+='</div>'});
+ let prev=0;HOLES.forEach((n,i)=>{const a=st.act[i];
+  if(a!=null){const d=-Math.round(a-t[i])||0,seg=d-prev;prev=d;
+   h+='<details class="card cp" data-i="'+i+'"'+(openCp.has(i)?' open':'')+'><summary class="row" style="cursor:pointer;list-style:none"><span>✓ Hole '+n+' · '+P.fmt12(a)+'</span><span class="d '+P.cls(-d)+'">'+P.sgn(d)+'</span></summary>'
+    +'<div>Target '+P.fmt12(t[i])+' · Finished '+P.fmt12(a)+'</div>'
+    +'<div>This stretch: <b>'+P.sgn(seg)+'</b> · Round total: <b>'+P.sgn(d)+'</b></div>'
+    +'<button class="sm" onclick="ed('+i+')">Edit</button><button class="sm" onclick="un('+i+')">Undo</button></details>'}
+  else h+='<div class="card"><div class="row"><span>Hole '+n+' by <b>'+P.fmt12(t[i])+'</b></span></div><button class="big" onclick="rec('+i+')">Finished hole '+n+'</button></div>'});
  $('cps').innerHTML=h;live();
  $('hist').innerHTML=hist.length?'<table><tr><th>Date</th><th>Tee</th><th>Tgt</th><th>4</th><th>9</th><th>13</th><th>18</th></tr>'+hist.slice().reverse().map(r=>'<tr><td>'+r.date+'</td><td>'+r.tee+'</td><td>'+r.tgt+'</td>'+r.delta.map(d=>'<td>'+(d==null?'':((-d||0)>0?'+':'')+(-d||0))+'</td>').join('')+'</tr>').join('')+'</table>':'<p>No saved rounds yet.</p>';
 }
