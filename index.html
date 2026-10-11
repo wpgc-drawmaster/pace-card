@@ -183,7 +183,7 @@ $('wbtn').onclick=()=>{st.waits=st.waits||[];
 window.wedit=i=>{const c=prompt('Comment for wait '+(i+1),st.waits[i].comment||'');if(c!=null){st.waits[i].comment=c.trim();save();wrender()}};
 window.wdel=i=>{if(confirm('Delete this wait?')){st.waits.splice(i,1);save();wrender()}};
 function wrender(){const on=!!st.wait;$('wbtn').className=on?'on':'';$('wbox').style.display=on?'block':'none';
- $('wbtn').textContent=on?'■ Done Waiting  '+mss((Date.now()-st.wait.start)/1000):'⏸ Start Waiting';
+ $('wbtn').textContent=on?'■ Stop Waiting  '+mss((Date.now()-st.wait.start)/1000):'⏸ Start Waiting';
  const ws=st.waits||[];const tot=ws.reduce((s,w)=>s+w.secs,0);
  $('wlist').innerHTML=ws.length?'<details class="card"><summary style="font-weight:800;cursor:pointer">Waits this round: '+ws.length+' · total '+mss(tot)+'</summary>'+ws.map((w,i)=>'<div class="row" style="margin-top:6px"><span>'+hhmm(w.start)+' · <b>'+mss(w.secs)+'</b> · '+(w.comment||'<i>no comment</i>')+'</span><span><button class="chip" onclick="wedit('+i+')">Edit</button><button class="chip" onclick="wdel('+i+')">✕</button></span></div>').join('')+'</details>':''}
 $('wcsv').onclick=()=>{const rows=[WH];hist.forEach(r=>rowsW(r).forEach(x=>rows.push(x)));
