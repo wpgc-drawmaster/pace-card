@@ -8,7 +8,8 @@
 <meta name="apple-mobile-web-app-title" content="Pace Card">
 <meta name="theme-color" content="#0b3d1e">
 <title>WPGC Pace Card</title>
-<link rel="apple-touch-icon" id="ati">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" href="icon.png">
 <link rel="manifest" id="mf">
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:-apple-system,system-ui,sans-serif;background:#0b3d1e;color:#fff;padding:env(safe-area-inset-top) 12px 40px;font-size:18px}
@@ -23,7 +24,7 @@ button{font-size:20px;font-weight:800;border:0;border-radius:12px;padding:14px;m
 .d{font-weight:900;padding:4px 10px;border-radius:8px}.g{background:#2ecc40;color:#000}.a{background:#ffb300;color:#000}.r{background:#ff3b30;color:#fff}
 table{width:100%;border-collapse:collapse;font-size:15px}td,th{border-bottom:1px solid #2e7d4f;padding:4px;text-align:left}
 </style></head><body>
-<h1>⛳ WPGC Pace Card</h1>
+<h1 style="display:flex;align-items:center;gap:10px"><img src="logo.png" alt="WPGC" style="width:44px;height:44px;border-radius:50%">WPGC Pace Card</h1>
 <div id="live">—</div>
 <div class="card">
 <label>Target round (h:mm)<input id="tgt" inputmode="numeric" value="4:10"></label>
@@ -75,7 +76,7 @@ $('csv').onclick=async()=>{const rows=[['date','tee','target','h4','h9','h13','h
  const csv=rows.map(r=>r.join(',')).join('\n');try{await navigator.clipboard.writeText(csv);alert('CSV copied to clipboard')}catch(e){const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='pace-history.csv';a.click()}};
 // icon + manifest
 const c=document.createElement('canvas');c.width=c.height=180;const x=c.getContext('2d');x.fillStyle='#0b3d1e';x.fillRect(0,0,180,180);x.fillStyle='#fff';x.font='bold 70px sans-serif';x.textAlign='center';x.fillText('4:10',90,115);
-const icon=c.toDataURL();$('ati').href=icon;
+const icon=new URL('icon.png',location.href).href;
 $('mf').href='data:application/manifest+json,'+encodeURIComponent(JSON.stringify({name:'WPGC Pace Card',short_name:'Pace Card',display:'standalone',background_color:'#0b3d1e',theme_color:'#0b3d1e',start_url:location.href,icons:[{src:icon,sizes:'180x180',type:'image/png'}]}));
 render();setInterval(live,15000);
 }
