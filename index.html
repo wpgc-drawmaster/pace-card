@@ -116,7 +116,7 @@ function mail(subj,body){const lastCap=(hist[hist.length-1]||{}).cap||st.cap||''
  location.href='mailto:drawmaster.wpgc@gmail.com?'+(cc?'cc='+encodeURIComponent(cc)+'&':'')+'subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(body)}
 const hhmm=ms=>{const d=new Date(ms);return P.fmt12(d.getHours()*60+d.getMinutes())};
 function stretch(){const i=st.act.findIndex(a=>a==null);return i<0?'after 18':i==0?'holes 1-4':'holes '+(HOLES[i-1]+1)+'-'+HOLES[i]}
-['Teebox ','Fairway, waiting for green','Green','Par 3 tee'].forEach(c=>{const b=document.createElement('button');b.className='chip';b.textContent=c.trim();b.onclick=()=>{$('wcom').value=c;$('wcom').focus();if(st.wait){st.wait.comment=c;save()}};$('chips').appendChild(b)});
+['Teebox ','Fairway, waiting for green','Par 3 tee'].forEach(c=>{const b=document.createElement('button');b.className='chip';b.textContent=c.trim();b.onclick=()=>{$('wcom').value=c;$('wcom').focus();if(st.wait){st.wait.comment=c;save()}};$('chips').appendChild(b)});
 $('wcom').oninput=e=>{if(st.wait){st.wait.comment=e.target.value;save()}};
 $('wbtn').onclick=()=>{st.waits=st.waits||[];
  if(!st.wait){st.wait={start:Date.now(),comment:'',stretch:stretch()};$('wcom').value=''}
