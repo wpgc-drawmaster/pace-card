@@ -137,7 +137,7 @@ window.teeNow=()=>{st.atee=Math.round(nowMin());save();render()};
 window.teeUn=()=>{st.atee=null;save();render()};
 window.teeEd=()=>{const m=st.atee;const v=prompt('Actual tee time (24h HH:MM)',String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0'));if(v&&/^\d{1,2}:\d{2}$/.test(v)){st.atee=P.hm(v);save();render()}};
 function saveRound(){if(!st.act.some(a=>a!=null))return null;const t=T();const base=teeBase();
- const r={id:rid(),course:st.course||'',grp:st.grp||'',cap:st.cap||'',date:st.date,tee:P.fmt12(P.hm(st.tee)),atee:st.atee!=null?P.fmt12(st.atee):'',tdel:st.atee!=null?st.atee-P.hm(st.tee):'',tgt:st.tgt,act:st.act.map(a=>a==null?'':P.fmt12(a)),delta:st.act.map((a,i)=>a==null||t[i]==null?null:Math.round(a-t[i])),waits:(st.waits||[]).slice(),rtime:st.act[LAST()]!=null?P.fmtDur(st.act[LAST()]-base):'',holes:HM()};
+ const r={id:rid(),course:st.course||'',grp:st.grp||'',cap:st.cap||'',date:st.date,tee:P.fmt12(P.hm(st.tee)),atee:st.atee!=null?P.fmt12(st.atee):'',tdel:st.atee!=null?st.atee-P.hm(st.tee):'',tgt:st.tgt,act:st.act.map(a=>a==null?'':P.fmt12(a)),delta:st.act.map((a,i)=>a==null||t[i]==null?null:Math.round(a-t[i])),waits:(st.waits||[]).slice(),rtime:st.act[LAST()]!=null?P.fmtDur(st.act[LAST()]-base):'',holes:HM(),...(()=>{const d=new Date(),p=n=>String(n).padStart(2,'0');return {sdate:d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()),stime:p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds())}})()};
  hist.push(r);st={date:new Date().toISOString().slice(0,10),tee:st.tee,tgt:st.tgt,act:[null,null,null,null],course:st.course,grp:st.grp,cap:st.cap,waits:[],wait:null,atee:null,holes:st.holes||'18'};save();$('dt').value=st.date;$('set').open=true;render();wrender();return r}
 
 $('csv').onclick=()=>{const rows=[RH].concat(hist.map(rowR));
@@ -163,8 +163,8 @@ function allocRender(){const hm=HM(),on=ACT(hm),n9=hm!=='18',fr=courseFR(st.cour
   const o=JSON.parse(localStorage.getItem('pc_alloc')||'{}');o[k]=f;localStorage.setItem('pc_alloc',JSON.stringify(o));render()});
  $('adef').onclick=()=>{const o=JSON.parse(localStorage.getItem('pc_alloc')||'{}');delete o[k];localStorage.setItem('pc_alloc',JSON.stringify(o));render()}}
 allocRender();
-const RH=['course','group','captain_email','date','sched_tee','actual_tee','tee_delay_min','target','round_time','h4','h9','h13','h18','d4','d9','d13','d18','total_wait_min','wait_count','holes'],WH=['course','date','group','captain_email','sched_tee','actual_tee','wait_no','start','end','wait_mmss','wait_min','stretch','comment'];
-function rowR(r){return [r.course||'',r.grp||'',r.cap||'',r.date,r.tee,r.atee||'',r.tdel==null?'':r.tdel,r.tgt,r.rtime||'',...r.act,...r.delta.map(d=>d==null?'':(-d||0)),wmin((r.waits||[]).reduce((s,w)=>s+w.secs,0)),(r.waits||[]).length,r.holes||'18']}
+const RH=['course','group','captain_email','date','sched_tee','actual_tee','tee_delay_min','target','round_time','h4','h9','h13','h18','d4','d9','d13','d18','total_wait_min','wait_count','holes','saved_date','saved_time'],WH=['course','date','group','captain_email','sched_tee','actual_tee','wait_no','start','end','wait_mmss','wait_min','stretch','comment'];
+function rowR(r){return [r.course||'',r.grp||'',r.cap||'',r.date,r.tee,r.atee||'',r.tdel==null?'':r.tdel,r.tgt,r.rtime||'',...r.act,...r.delta.map(d=>d==null?'':(-d||0)),wmin((r.waits||[]).reduce((s,w)=>s+w.secs,0)),(r.waits||[]).length,r.holes||'18',r.sdate||'',r.stime||'']}
 function rowsW(r){return (r.waits||[]).map((w,i)=>[r.course||'',r.date,r.grp||'',r.cap||'',r.tee,r.atee||'',i+1,hhmm(w.start),hhmm(w.end),mss(w.secs),wmin(w.secs),w.stretch||'',w.comment||''])}
 const toCSV=rows=>rows.map(r=>r.map(qv).join(',')).join('\n');
 function doneBox(){const box=$('done');const L=LAST();if(st.act[L]==null||st.dismiss){box.style.display='none';$('reopen').style.display=st.act[L]!=null?'inline-block':'none';return}
