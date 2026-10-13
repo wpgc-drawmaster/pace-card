@@ -18,7 +18,7 @@ h1{font-size:24px;margin:12px 0}h2{font-size:20px;margin:18px 0 8px}
 #pace{font-size:34px;font-weight:900;text-align:center;padding:16px 10px;border-radius:14px;margin-bottom:8px;background:#fff;color:#0b3d1e}#pace small{display:block;font-size:15px;font-weight:700}.g{background:#2ecc40;color:#000}.a{background:#ffd60a;color:#000}.r{background:#ff3b30;color:#fff}#pace.g{background:#2ecc40;color:#000}#pace.a{background:#ffd60a;color:#000}#pace.r{background:#ff3b30;color:#fff}
 #live{background:#fff;color:#0b3d1e;font-weight:800;font-size:22px;padding:14px;border-radius:12px;}
 .card{background:#145c2e;border-radius:12px;padding:12px;margin:10px 0}
-label{display:block;font-weight:700;margin:6px 0}input{font-size:22px;padding:10px;border-radius:8px;border:2px solid #fff;width:100%}
+label{display:block;font-weight:700;margin:6px 0}input,select{font-size:22px;padding:10px;border-radius:8px;border:2px solid #fff;width:100%}select{background:#fff;color:#000;display:block}
 button{font-size:20px;font-weight:800;border:0;border-radius:12px;padding:14px;min-height:56px;cursor:pointer}
 #wbtn{width:100%;font-size:24px;min-height:72px;margin-top:10px;background:#ff9f0a;color:#000;font-weight:900;border-radius:12px;border:0}#wbtn.on{background:#ff3b30;color:#fff}
 .wrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid #2e7d4f}.wtxt{flex:1;min-width:0}.wt{font-size:14px;opacity:.8}.wc{font-size:16px;opacity:.95}.wbtns{display:flex;gap:6px;flex-shrink:0}.wb{width:40px;height:40px;border:0;border-radius:10px;background:#e8f5e9;color:#0b3d1e;font-size:18px;padding:0}
@@ -34,7 +34,7 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{border-bottom:1px
 <div class="card" id="setcard">
 <details id="set" open><summary id="sum" style="font-weight:800;cursor:pointer;padding:6px 0">Setup Round</summary>
 <label>Date<input id="dt" type="date"></label>
-<label>Course<input id="course" list="courses" placeholder="Fraserview, Langara, McCleery or Kamloops"><datalist id="courses"><option value="Fraserview"><option value="Langara"><option value="McCleery"><option value="Kamloops Golf and Country Club"></datalist></label>
+<label>Course<select id="course"><option value="">— Select course —</option></select></label>
 <label>Group Name<input id="grp" placeholder="e.g. Group 7"></label>
 <label>Target Round Duration (h:mm)<input id="tgt" inputmode="numeric" value="4:10" placeholder="4:10 (or type 410)"></label>
 <label>Scheduled Tee Time<input id="tee" type="time" value="09:54"></label>
@@ -70,6 +70,7 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{border-bottom:1px
 const HOLES=[4,9,13,18],SEGS=[[1,4],[5,9],[10,13],[14,18]];
 const PARS={langara:[4,3,5,4,4,4,4,3,4,4,5,3,4,3,4,5,4,4],mccleery:[5,4,3,4,3,4,3,4,5,4,5,4,3,5,4,3,4,4],kamloops:[4,5,3,4,4,5,4,3,4,4,4,5,3,4,3,4,4,5]};
 const W={3:11,4:14,5:17};
+const COURSE_NAMES={fraserview:'Fraserview',langara:'Langara',mccleery:'McCleery',kamloops:'Kamloops Golf and Country Club'};
 function ckey(course){const c=(course||'').toLowerCase();return Object.keys(PARS).find(k=>c.includes(k))||'fraserview'}
 function defFR(course){const k=ckey(course);if(!PARS[k])return [59/250,125/250,181/250,1];
  const w=PARS[k].map(p=>W[p]);const cum=HOLES.map(h=>w.slice(0,h).reduce((a,b)=>a+b,0));return cum.map(x=>x/cum[3])}
@@ -87,6 +88,7 @@ if(typeof module!=='undefined'){module.exports=P}
 if(typeof document!=='undefined'){
 const $=id=>document.getElementById(id),LS=localStorage;
 let st=JSON.parse(LS.getItem('pc_cur')||'null')||{date:new Date().toISOString().slice(0,10),tee:'09:54',tgt:'4:10',act:[null,null,null,null]};
+{const sel=document.getElementById('course');Object.values(COURSE_NAMES).forEach(n=>{const o=document.createElement('option');o.value=o.textContent=n;sel.appendChild(o)});if(st.course){const c=st.course.toLowerCase(),k=Object.keys(COURSE_NAMES).find(k=>c.includes(k));st.course=k?COURSE_NAMES[k]:'';LS.setItem('pc_cur',JSON.stringify(st))}}
 let hist=JSON.parse(LS.getItem('pc_hist')||'[]');
 const UPLOAD_URL='https://script.google.com/macros/s/AKfycbz2yNO0msfE8xX8awzvjj226hAWziWcxx-qlZRNMqiEpfcTRm58yGQFUoB8K3Y9j2AJ/exec';// Drawmaster Apps Script /exec URL (set after deployment)
 const APP_VERSION='2026-10-13';
