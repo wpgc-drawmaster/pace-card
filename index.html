@@ -56,6 +56,7 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{border-bottom:1px
 <button class="sm" id="dsave">Save only (email later)</button> <button class="sm" id="dlater">Not yet</button>
 </div></div>
 <button class="sm" id="reopen" style="display:none;background:#ffd60a">🏁 Finish round</button>
+<div id="upst" style="display:none;font-size:14px;margin:6px 0;padding:6px 10px;border-radius:8px;background:#123f24"></div>
 <div id="atee"></div>
 <div id="cps"></div>
 <h2>History</h2>
@@ -84,6 +85,8 @@ if(typeof document!=='undefined'){
 const $=id=>document.getElementById(id),LS=localStorage;
 let st=JSON.parse(LS.getItem('pc_cur')||'null')||{date:new Date().toISOString().slice(0,10),tee:'09:54',tgt:'4:10',act:[null,null,null,null]};
 let hist=JSON.parse(LS.getItem('pc_hist')||'[]');
+const UPLOAD_URL='';// Drawmaster Apps Script /exec URL (set after deployment)
+const APP_VERSION='2026-10-13';
 const save=()=>{LS.setItem('pc_cur',JSON.stringify(st));LS.setItem('pc_hist',JSON.stringify(hist))};
 const nowMin=()=>{const d=new Date();return d.getHours()*60+d.getMinutes()+d.getSeconds()/60};
 const teeBase=()=>st.atee!=null?st.atee:P.hm(st.tee);const T=()=>P.targets(teeBase(),P.parseDur(st.tgt)||250,st.course);
@@ -123,7 +126,7 @@ window.teeNow=()=>{st.atee=Math.round(nowMin());save();render()};
 window.teeUn=()=>{st.atee=null;save();render()};
 window.teeEd=()=>{const m=st.atee;const v=prompt('Actual tee time (24h HH:MM)',String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0'));if(v&&/^\d{1,2}:\d{2}$/.test(v)){st.atee=P.hm(v);save();render()}};
 function saveRound(){if(!st.act.some(a=>a!=null))return null;const t=T();const base=teeBase();
- const r={course:st.course||'',grp:st.grp||'',cap:st.cap||'',date:st.date,tee:P.fmt12(P.hm(st.tee)),atee:st.atee!=null?P.fmt12(st.atee):'',tdel:st.atee!=null?st.atee-P.hm(st.tee):'',tgt:st.tgt,act:st.act.map(a=>a==null?'':P.fmt12(a)),delta:st.act.map((a,i)=>a==null?null:Math.round(a-t[i])),waits:(st.waits||[]).slice(),rtime:st.act[3]!=null?P.fmtDur(st.act[3]-base):''};
+ const r={id:rid(),course:st.course||'',grp:st.grp||'',cap:st.cap||'',date:st.date,tee:P.fmt12(P.hm(st.tee)),atee:st.atee!=null?P.fmt12(st.atee):'',tdel:st.atee!=null?st.atee-P.hm(st.tee):'',tgt:st.tgt,act:st.act.map(a=>a==null?'':P.fmt12(a)),delta:st.act.map((a,i)=>a==null?null:Math.round(a-t[i])),waits:(st.waits||[]).slice(),rtime:st.act[3]!=null?P.fmtDur(st.act[3]-base):''};
  hist.push(r);st={date:new Date().toISOString().slice(0,10),tee:st.tee,tgt:st.tgt,act:[null,null,null,null],course:st.course,grp:st.grp,cap:st.cap,waits:[],wait:null,atee:null};save();$('dt').value=st.date;$('set').open=true;render();wrender();return r}
 
 $('csv').onclick=()=>{const rows=[RH].concat(hist.map(rowR));
@@ -163,8 +166,8 @@ function doneBox(){const box=$('done');if(st.act[3]==null||st.dismiss){box.style
  box.style.display='flex'}
 $('dsend').onclick=()=>{if(st.wait)$('wbtn').onclick();const r=saveRound();if(!r)return;
  const tag=fslug([r.date,r.course,r.grp]);const f=[['wpgc-pace-round-'+tag+'.csv',toCSV([RH,rowR(r)])]];if(r.waits.length)f.push(['wpgc-wait-log-'+tag+'.csv',toCSV([WH].concat(rowsW(r)))]);
- shareFiles(f,'WPGC Pace Round '+[r.course,r.grp,r.date].filter(Boolean).join(' - '))};
-$('dsave').onclick=()=>{if(st.wait)$('wbtn').onclick();saveRound()};
+ upload(r);shareFiles(f,'WPGC Pace Round '+[r.course,r.grp,r.date].filter(Boolean).join(' - '))};
+$('dsave').onclick=()=>{if(st.wait)$('wbtn').onclick();const r=saveRound();if(r)upload(r)};
 $('dlater').onclick=()=>{st.dismiss=true;save();doneBox()};
 $('reopen').onclick=()=>{st.dismiss=false;save();doneBox()};
 
@@ -193,6 +196,18 @@ $('wcsv').onclick=()=>{const rows=[WH];hist.forEach(r=>rowsW(r).forEach(x=>rows.
  if(rows.length<2){alert('No waits in saved rounds yet. Finish a round first.');return}
  const d=new Date().toISOString().slice(0,10);shareFiles([['wpgc-wait-log-'+d+'.csv',toCSV(rows)]],'WPGC Wait Log '+d)};
 setInterval(()=>{if(st.wait)wrender()},1000);
+// --- automatic upload to Drawmaster Pace Log sheet ---
+function rid(){return Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8)}
+function payload(r){const o={},w=[];RH.forEach((k,i)=>o[k]=rowR(r)[i]);o.round_id=r.id;o.app_version=APP_VERSION;
+ rowsW(r).forEach(x=>{const z={};WH.forEach((k,i)=>z[k]=x[i]);w.push(z)});return {round:o,waits:w}}
+function upMsg(t){const e=$('upst');e.textContent=t;e.style.display=t?'block':'none'}
+async function upload(r){if(!UPLOAD_URL)return;if(!r.id){r.id=rid();save()}
+ if(!navigator.onLine){r.upq=true;save();upMsg('📶 Will send to Drawmaster when online');return}
+ try{await fetch(UPLOAD_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload(r))});
+  r.uploaded=true;delete r.upq;save();upMsg('Sent to Drawmaster ✓')}
+ catch(e){r.upq=true;save();upMsg('📶 Will send to Drawmaster when online')}}
+async function retryUploads(){if(!UPLOAD_URL||!navigator.onLine)return;for(const r of hist.filter(r=>r.upq&&!r.uploaded))await upload(r)}
+window.addEventListener('online',retryUploads);retryUploads();
 wrender();
 }
 </script></body></html>
