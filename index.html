@@ -20,7 +20,7 @@ h1{font-size:24px;margin:12px 0}h2{font-size:20px;margin:18px 0 8px}
 .card{background:#145c2e;border-radius:12px;padding:12px;margin:10px 0}
 label{display:block;font-weight:700;margin:6px 0}input,select{font-size:22px;padding:10px;border-radius:8px;border:2px solid #fff;width:100%}select{background:#fff;color:#000;display:block}
 button{font-size:20px;font-weight:800;border:0;border-radius:12px;padding:14px;min-height:56px;cursor:pointer}
-#wbtn{width:100%;font-size:24px;min-height:72px;margin-top:10px;background:#ff9f0a;color:#000;font-weight:900;border-radius:12px;border:0}#wbtn.on{background:#ff3b30;color:#fff}
+#wbtn{display:block;width:50%;min-width:160px;margin:10px auto 0;font-size:19px;min-height:48px;background:#d9ddd9;color:#1d2b22;font-weight:800;border-radius:999px;border:0}#wbtn.on{background:#ff3b30;color:#fff;font-variant-numeric:tabular-nums}
 .wrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid #2e7d4f}.wtxt{flex:1;min-width:0}.wt{font-size:14px;opacity:.8}.wc{font-size:16px;opacity:.95}.wbtns{display:flex;gap:6px;flex-shrink:0}.wb{width:40px;height:40px;border:0;border-radius:10px;background:#e8f5e9;color:#0b3d1e;font-size:18px;padding:0}
 .chip{background:#e8f5e9;color:#0b3d1e;border:0;border-radius:16px;padding:6px 10px;margin:4px 4px 0 0;font-size:15px}
 .big{width:100%;background:#fff;color:#0b3d1e;font-size:24px;min-height:72px}
@@ -47,7 +47,7 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{border-bottom:1px
 
 </div>
 <div style="position:sticky;top:0;z-index:3;background:#0b3d1e;padding-bottom:6px"><div id="pace">—</div><div id="live">—</div></div>
-<div id="wwrap" style="display:none"><button id="wbtn">⏸ Start Waiting</button>
+<div id="wwrap" style="display:none"><button id="wbtn">⏳ Waiting</button>
 <div id="wbox" class="card" style="display:none">
 <label>Wait comment<input id="wcom" placeholder="e.g. Teebox 3"></label>
 <div id="chips"></div>
@@ -200,7 +200,7 @@ $('wbtn').onclick=()=>{st.waits=st.waits||[];
 window.wedit=i=>{const c=prompt('Comment for wait '+(i+1),st.waits[i].comment||'');if(c!=null){st.waits[i].comment=c.trim();save();wrender()}};
 window.wdel=i=>{if(confirm('Delete this wait?')){st.waits.splice(i,1);save();wrender()}};
 function wrender(){const on=!!st.wait;$('wbtn').className=on?'on':'';$('wbox').style.display=on?'block':'none';
- $('wbtn').textContent=on?'■ Stop Waiting  '+mss((Date.now()-st.wait.start)/1000):'⏸ Start Waiting';
+ $('wbtn').textContent=on?'■ Stop '+mss((Date.now()-st.wait.start)/1000):'⏳ Waiting';
  const ws=st.waits||[];const tot=ws.reduce((s,w)=>s+w.secs,0);
  $('wlist').innerHTML=ws.length?'<details class="card"><summary style="font-weight:800;cursor:pointer">Waits this round: '+ws.length+' · total '+mss(tot)+'</summary>'+ws.map((w,i)=>'<div class="wrow"><div class="wtxt"><div><b>'+mss(w.secs)+'</b> <span class="wt">at '+hhmm(w.start)+'</span></div><div class="wc">'+(w.comment||'<i>no comment</i>')+'</div></div><div class="wbtns"><button class="wb" onclick="wedit('+i+')" aria-label="Edit">✎</button><button class="wb" onclick="wdel('+i+')" aria-label="Delete">✕</button></div></div>').join('')+'</details>':''}
 $('wcsv').onclick=()=>{const rows=[WH];hist.forEach(r=>rowsW(r).forEach(x=>rows.push(x)));
