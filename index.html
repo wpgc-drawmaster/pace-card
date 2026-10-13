@@ -88,6 +88,7 @@ if(typeof module!=='undefined'){module.exports=P}
 if(typeof document!=='undefined'){
 const $=id=>document.getElementById(id),LS=localStorage;
 let st=JSON.parse(LS.getItem('pc_cur')||'null')||{date:new Date().toISOString().slice(0,10),tee:'09:54',tgt:'4:10',act:[null,null,null,null]};
+window.__st=()=>st;window.__P=P;
 {const sel=document.getElementById('course');Object.values(COURSE_NAMES).forEach(n=>{const o=document.createElement('option');o.value=o.textContent=n;sel.appendChild(o)});if(st.course){const c=st.course.toLowerCase(),k=Object.keys(COURSE_NAMES).find(k=>c.includes(k));st.course=k?COURSE_NAMES[k]:'';LS.setItem('pc_cur',JSON.stringify(st))}}
 let hist=JSON.parse(LS.getItem('pc_hist')||'[]');
 const UPLOAD_URL='https://script.google.com/macros/s/AKfycbz2yNO0msfE8xX8awzvjj226hAWziWcxx-qlZRNMqiEpfcTRm58yGQFUoB8K3Y9j2AJ/exec';// Drawmaster Apps Script /exec URL (set after deployment)
@@ -106,7 +107,7 @@ function render(){if(!ready()){$('set').open=true;h4was=null;$('tee').value=st.t
     +'<div>This stretch: <b>'+P.sgn(seg)+'</b> · Round total: <b>'+P.sgn(d)+'</b></div>'
     +'<button class="sm" onclick="ed('+i+')">Edit</button><button class="sm" onclick="un('+i+')">Undo</button></details>'}
   else h+='<div class="card" data-open="'+i+'"><div class="row"><span>Hole '+n+' by <b>'+P.fmt12(t[i])+'</b></span></div><button class="big" onclick="rec('+i+')">Finished hole '+n+'</button></div>'});
- const sch=P.hm(st.tee);$('atee').innerHTML=st.atee==null?'<div class="card"><div>Scheduled tee '+P.fmt12(sch)+'</div><button class="big" onclick="teeNow()">⛳ First tee shot hit</button></div>':(()=>{const dl=st.atee-sch;return '<details class="card"><summary class="row" style="cursor:pointer;list-style:none"><span>✓ Teed off '+P.fmt12(st.atee)+'</span><span>'+(dl===0?'on time':Math.abs(dl)+' min '+(dl>0?'late':'early'))+'</span></summary><div>Scheduled '+P.fmt12(sch)+' · Actual '+P.fmt12(st.atee)+'</div><button class="sm" onclick="teeEd()">Edit</button><button class="sm" onclick="teeUn()">Undo</button></details>'})();
+ const sch=P.hm(st.tee);$('atee').innerHTML=st.atee==null?'<div class="card"><div>Scheduled tee '+P.fmt12(sch)+'</div><button class="big" id="teeb" onclick="teeNow()">⛳ First tee shot hit<span id="tcd" style="display:none;font-size:16px;font-weight:700;margin-top:4px"></span></button></div>':(()=>{const dl=st.atee-sch;return '<details class="card"><summary class="row" style="cursor:pointer;list-style:none"><span>✓ Teed off '+P.fmt12(st.atee)+'</span><span>'+(dl===0?'on time':Math.abs(dl)+' min '+(dl>0?'late':'early'))+'</span></summary><div>Scheduled '+P.fmt12(sch)+' · Actual '+P.fmt12(st.atee)+'</div><button class="sm" onclick="teeEd()">Edit</button><button class="sm" onclick="teeUn()">Undo</button></details>'})();
  {const ww=window.WW||(window.WW=$('wwrap'));document.body.appendChild(ww)}
  if(typeof allocRender==='function'&&$('allocb'))allocRender();
  $('cps').innerHTML=h;{const ww=window.WW,nx=$('cps').querySelector('[data-open]');if(st.atee!=null&&nx){$('cps').insertBefore(ww,nx);ww.style.display='block'}else if(st.wait&&!nx){$('cps').appendChild(ww);ww.style.display='block'}else ww.style.display='none'}if(typeof doneBox==='function')doneBox();live();
@@ -215,4 +216,13 @@ async function retryUploads(){if(!UPLOAD_URL||!navigator.onLine)return;for(const
 window.addEventListener('online',retryUploads);retryUploads();
 wrender();
 }
-</script><script>(function(){const c=document.getElementById("setcard");const f=()=>{const v=id=>(document.getElementById(id).value||"").trim();c.classList.toggle("unset",!(v("course")&&v("tgt")&&v("tee")))};document.addEventListener("input",f);document.addEventListener("change",f);document.addEventListener("click",()=>setTimeout(f,0));document.getElementById("sdone").addEventListener("click",()=>{document.getElementById("set").open=false;window.scrollTo(0,0)});f()})();</script></body></html>
+</script><script>(function(){const c=document.getElementById("setcard");const f=()=>{const v=id=>(document.getElementById(id).value||"").trim();c.classList.toggle("unset",!(v("course")&&v("tgt")&&v("tee")))};document.addEventListener("input",f);document.addEventListener("change",f);document.addEventListener("click",()=>setTimeout(f,0));document.getElementById("sdone").addEventListener("click",()=>{document.getElementById("set").open=false;window.scrollTo(0,0)});f()})();</script><script>(function(){function tick(){const st=window.__st(),P=window.__P;const b=document.getElementById('teeb'),c=document.getElementById('tcd');if(!b||!c)return;
+const m=String(st.tee||'').match(/^(\d{1,2}):(\d{2})/);if(!m){c.style.display='none';b.style.background='';b.style.color='';return}
+const d=(st.date&&/^\d{4}-\d{2}-\d{2}$/.test(st.date))?new Date(st.date+'T00:00:00'):new Date();d.setHours(+m[1],+m[2],0,0);
+const now=new Date(),same=d.toDateString()===now.toDateString();
+let lbl='Tee time '+(same?'':d.toLocaleDateString('en-US',{weekday:'short'})+' ')+P.fmt12(+m[1]*60+ +m[2]);
+let s=Math.round((d-now)/1000),bg='',fg='';
+if(s>=0){const h=Math.floor(s/3600),mm=Math.floor(s%3600/60),ss=s%60,p=n=>String(n).padStart(2,'0');lbl+=' · in '+(h?h+':'+p(mm)+':'+p(ss):mm+':'+p(ss));if(s<=300){bg='#f5c400';fg='#3a2e00'}}
+else{const late=Math.floor(-s/60);lbl+=' · '+(late<1?'now':late+' min late');bg='#d32f2f';fg='#fff'}
+c.textContent=lbl;c.style.display='block';b.style.background=bg;b.style.color=fg}
+setInterval(tick,1000);new MutationObserver(tick).observe(document.getElementById('atee'),{childList:true});tick()})();</script></body></html>
