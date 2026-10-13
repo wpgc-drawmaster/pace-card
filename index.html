@@ -113,10 +113,10 @@ function render(){if(!ready()){$('set').open=true;h4was=null;$('tee').value=st.t
  $('hist').innerHTML=hist.length?'<table><tr><th>Date</th><th>Tee</th><th>Tgt</th><th>4</th><th>9</th><th>13</th><th>18</th></tr>'+hist.slice().reverse().map(r=>'<tr><td>'+r.date+'</td><td>'+r.tee+'</td><td>'+r.tgt+'</td>'+r.delta.map(d=>'<td>'+(d==null?'':((-d||0)>0?'+':'')+(-d||0))+'</td>').join('')+'</tr>').join('')+'</table>':'<p>No saved rounds yet.</p>';
 }
 function pace(){const t=T(),i=st.act.findIndex(a=>a==null);let last=null,lh=0;st.act.forEach((a,k)=>{if(a!=null){last=-Math.round(a-t[k])||0;lh=HOLES[k]}});
- let v=last,src=lh?'as of hole '+lh:'';
- if(i>=0&&st.atee!=null){const over=nowMin()-t[i];if(over>0&&(v==null||-Math.round(over)<v)){v=-Math.round(over);src='live, hole '+HOLES[i]+' overdue'}}
- const el=$('pace');if(v==null){el.className='';el.innerHTML=st.atee==null?'Not teed off<small>Tap ⛳ when your first tee shot goes</small>':'On pace<small>no checkpoints yet</small>';return}
- el.className=v>=0?'g':v>=-5?'a':'r';el.innerHTML=(v===0?'ON PACE':Math.abs(v)+' min '+(v<0?'BEHIND':'AHEAD'))+'<small>'+src+' · target '+st.tgt+'</small>'}
+ let v=last,src=lh?'at hole '+lh:'';
+ if(i>=0&&st.atee!=null){const over=nowMin()-t[i];if(over>0&&(v==null||-Math.round(over)<v)){v=-Math.round(over);src='heading to hole '+HOLES[i]+', running late'}}
+ const el=$('pace');if(v==null){el.className='';el.innerHTML=st.atee==null?'Not teed off<small>Tap ⛳ when your first tee shot goes</small>':'ON PACE<small>heading to hole '+HOLES[Math.max(i,0)]+' · round target '+st.tgt+'</small>';return}
+ el.className=v>=0?'g':v>=-5?'a':'r';el.innerHTML=(v===0?'ON PACE':Math.abs(v)+' min '+(v<0?'BEHIND':'AHEAD'))+'<small>'+src+' · round target '+st.tgt+'</small>'}
 function live(){if(!ready()){$('pace').className='';$('pace').innerHTML='Set up your round<small>Setup Round is at the top of the screen</small>';$('live').className='';$('live').textContent='Next: complete Setup Round';return}pace();const t=T(),i=st.act.findIndex(a=>a==null);if(i<0){const d=-Math.round(st.act[3]-t[3])||0;$('live').className='';$('live').textContent='Round done: '+P.sgn(d)+' vs '+st.tgt;return}
  const rem=t[i]-nowMin(),togo=Math.round(rem);$('live').className=rem<0?'r':rem<=5?'y':'';$('live').textContent='Next: hole '+HOLES[i]+' by '+P.fmt12(t[i])+' — '+(togo>=0?togo+' min to go':(-togo)+' min over')}
 window.rec=i=>{if(i==3)st.dismiss=false;st.act[i]=Math.round(nowMin());save();render()};
@@ -124,7 +124,7 @@ window.un=i=>{st.act[i]=null;if(i==3)st.dismiss=false;save();render()};
 window.ed=i=>{const v=prompt('Finish time (24h HH:MM)',(()=>{const m=st.act[i];return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')})());if(v&&/^\d{1,2}:\d{2}$/.test(v)){st.act[i]=P.hm(v);save();render()}};
 $('dt').value=st.date;$('dt').onchange=e=>{st.date=e.target.value||st.date;save();render()};$('cap').value=st.cap||'';$('cap').onchange=e=>{st.cap=e.target.value.trim();save()};$('course').value=st.course||'';$('grp').value=st.grp||'';$('course').onchange=e=>{st.course=e.target.value.trim();save();render()};$('grp').onchange=e=>{st.grp=e.target.value.trim();save()};
 $('tee').onchange=e=>{st.tee=e.target.value;save();render()};
-$('tgt').onchange=e=>{const v=P.parseDur(e.target.value);if(v){st.tgt=P.fmtDur(v)}else if(e.target.value.trim()){alert('Enter the target like 4:10, or just 410')}save();render()};
+$('tgt').onchange=e=>{const v=P.parseDur(e.target.value);if(v&&(v<180||v>360)&&!confirm('That target is '+P.fmtDur(v)+'. Did you mean 4:10?\n\nOK to keep '+P.fmtDur(v)+', Cancel to re-enter.')){e.target.value=st.tgt||'';e.target.focus();e.target.select&&e.target.select();return}if(v){st.tgt=P.fmtDur(v)}else if(e.target.value.trim()){alert('Enter the target like 4:10, or just 410')}save();render()};
 $('rst').onclick=()=>{if(!confirm('Reset this round? Clears Course, Group Name, Target Round Duration, Scheduled Tee Time, the tee shot, all checkpoint times and waits. Saved history is kept.'))return;st={date:new Date().toISOString().slice(0,10),tee:'',tgt:'',course:'',grp:'',cap:st.cap||'',act:[null,null,null,null],atee:null,waits:[],wait:null};save();$('dt').value=st.date;render();wrender()};
 $('clr').onclick=()=>{if(!confirm('Delete ALL saved rounds and waits on this phone? Share the CSVs first if you need them.'))return;if(!confirm('Are you sure? This cannot be undone.'))return;hist=[];save();render()};
 window.teeNow=()=>{st.atee=Math.round(nowMin());save();render()};
@@ -165,7 +165,7 @@ function doneBox(){const box=$('done');if(st.act[3]==null||st.dismiss){box.style
  $('reopen').style.display='none';const t=T(),d=-Math.round(st.act[3]-t[3])||0,rt=st.act[3]-teeBase(),ws=st.waits||[],tw=ws.reduce((s,w)=>s+w.secs,0);
  $('donebody').innerHTML='<div style="font-size:30px;font-weight:900;text-align:center;padding:10px;border-radius:12px" class="'+(d>=0?'g':d>=-5?'a':'r')+'">'+(d===0?'ON PACE':Math.abs(d)+' min '+(d<0?'BEHIND':'AHEAD'))+'</div>'
   +'<p>'+[st.course,st.grp,st.date].filter(Boolean).join(' · ')+'</p>'
-  +'<p>Round time <b>'+P.fmtDur(rt)+'</b> vs target <b>'+st.tgt+'</b></p>'
+  +'<p>Round time <b>'+P.fmtDur(rt)+'</b> vs round target <b>'+st.tgt+'</b></p>'
   +'<p>Teed off <b>'+P.fmt12(teeBase())+'</b>'+(st.atee!=null?' (scheduled '+P.fmt12(P.hm(st.tee))+')':' (scheduled time, tee shot not tapped)')+'</p>'
   +'<p>Waits <b>'+ws.length+'</b> · total <b>'+mss(tw)+'</b>'+(st.wait?' <i>(a wait is still running and will be stopped)</i>':'')+'</p>';
  box.style.display='flex'}
