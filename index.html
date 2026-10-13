@@ -28,16 +28,10 @@ button{font-size:20px;font-weight:800;border:0;border-radius:12px;padding:14px;m
 .row{display:flex;justify-content:space-between;align-items:center;font-size:20px;margin-bottom:8px}
 .d{font-weight:900;padding:4px 10px;border-radius:8px}.g{background:#2ecc40;color:#000}.a{background:#ffb300;color:#000}.r{background:#ff3b30;color:#fff}
 table{width:100%;border-collapse:collapse;font-size:15px}td,th{border-bottom:1px solid #2e7d4f;padding:4px;text-align:left}
+#setcard.unset{background:#fff3b0;border:3px solid #f5c400;color:#3a2e00}#setcard.unset summary{color:#3a2e00}#setcard.unset a{color:#5a4500}
 </style></head><body>
 <h1 style="display:flex;align-items:center;gap:10px"><img src="logo.png" alt="WPGC" style="width:44px;height:44px;border-radius:50%">WPGC Pace Card</h1>
-<div style="position:sticky;top:0;z-index:3;background:#0b3d1e;padding-bottom:6px"><div id="pace">—</div><div id="live">—</div></div>
-<div id="wwrap" style="display:none"><button id="wbtn">⏸ Start Waiting</button>
-<div id="wbox" class="card" style="display:none">
-<label>Wait comment<input id="wcom" placeholder="e.g. Teebox 3"></label>
-<div id="chips"></div>
-</div></div>
-<div id="wlist"></div>
-<div class="card">
+<div class="card" id="setcard">
 <details id="set" open><summary id="sum" style="font-weight:800;cursor:pointer;padding:6px 0">Setup Round</summary>
 <label>Date<input id="dt" type="date"></label>
 <label>Course<input id="course" list="courses" placeholder="Fraserview, Langara or McCleery"><datalist id="courses"><option value="Fraserview"><option value="Langara"><option value="McCleery"></datalist></label>
@@ -47,9 +41,18 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{border-bottom:1px
 <label>Captain Email (optional)<input id="cap" type="email" placeholder="captain@example.com"></label>
 <details id="alloc" style="margin-top:8px"><summary style="font-weight:700;cursor:pointer">Interval allocation</summary><div id="allocb"></div></details>
 <div style="margin-top:8px"><button class="sm" id="rst">Reset round</button> <button class="sm" id="clr" style="background:#ffdad6">Clear all history</button></div>
+<button id="sdone" style="width:100%;margin-top:10px">Done – collapse Setup</button>
 </details>
 
 </div>
+<div style="position:sticky;top:0;z-index:3;background:#0b3d1e;padding-bottom:6px"><div id="pace">—</div><div id="live">—</div></div>
+<div id="wwrap" style="display:none"><button id="wbtn">⏸ Start Waiting</button>
+<div id="wbox" class="card" style="display:none">
+<label>Wait comment<input id="wcom" placeholder="e.g. Teebox 3"></label>
+<div id="chips"></div>
+</div></div>
+<div id="wlist"></div>
+
 <div id="done" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:10;align-items:center;justify-content:center;padding:16px"><div class="card" style="background:#0b3d1e;max-width:420px;width:100%;border:2px solid #fff">
 <h2 style="margin-top:0">🏁 Round Complete</h2><div id="donebody"></div>
 <button class="big" id="dsend">Save &amp; Share Round CSV</button>
@@ -210,4 +213,4 @@ async function retryUploads(){if(!UPLOAD_URL||!navigator.onLine)return;for(const
 window.addEventListener('online',retryUploads);retryUploads();
 wrender();
 }
-</script></body></html>
+</script><script>(function(){const c=document.getElementById("setcard");const f=()=>{const v=id=>(document.getElementById(id).value||"").trim();c.classList.toggle("unset",!(v("course")&&v("tgt")&&v("tee")))};document.addEventListener("input",f);document.addEventListener("change",f);document.addEventListener("click",()=>setTimeout(f,0));document.getElementById("sdone").addEventListener("click",()=>{document.getElementById("set").open=false;window.scrollTo(0,0)});f()})();</script></body></html>
