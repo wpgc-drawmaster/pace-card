@@ -1,0 +1,85 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WPGC Pace Card – What's new</title><style>body{margin:0;background:#0b3d1e;color:#fff;font-family:-apple-system,system-ui,Segoe UI,Roboto,sans-serif;line-height:1.45}
+.wrap{max-width:640px;margin:0 auto;padding:14px}h1{display:flex;align-items:center;gap:10px;font-size:24px;margin:6px 0 12px}
+h1 img{width:40px;height:40px;border-radius:50%}.bar{display:flex;gap:10px;margin-bottom:14px;position:sticky;top:0;background:#0b3d1e;padding:8px 0;z-index:2}
+.bar a,.bar button{flex:1;text-align:center;font-size:17px;font-weight:800;padding:12px;border-radius:12px;border:0;text-decoration:none;cursor:pointer}
+.back{background:#fff;color:#0b3d1e}.ref{background:#ff9f0a;color:#000}
+.rel{background:#165c31;border-radius:14px;padding:4px 16px 10px;margin-bottom:14px}.rel.latest{border:3px solid #ffd60a}
+h2{font-size:19px;margin:12px 0 6px}.tag{background:#ffd60a;color:#3a2e00;font-size:13px;padding:2px 8px;border-radius:999px;vertical-align:middle}
+ul{padding-left:20px;margin:4px 0}li{margin:4px 0}a{color:#9be7a5}p{margin:8px 0}</style></head><body><div class="wrap">
+<h1><img src="logo.png" alt="WPGC">What's new in the Pace Card</h1>
+<div class="bar"><a class="back" href="./">← Back to app</a><button class="ref" onclick="location.href='./?v='+Date.now()">⟳ Refresh to latest</button></div>
+
+
+<p>Newest release first. App: <a href="https://wpgc-drawmaster.github.io/pace-card/">https://wpgc-drawmaster.github.io/pace-card/</a> · Guide: <a href="https://wpgc-drawmaster.github.io/pace-card/guide.pdf">https://wpgc-drawmaster.github.io/pace-card/guide.pdf</a></p>
+<p>To see which version you have, look at the small line at the very bottom of the app (for example &quot;Version 2 · 2026-Oct-13:19:23&quot;).</p>
+
+<section class="rel latest"><h2>Version 3 · 2026-Oct-14:07:05 PT <span class="tag">Latest</span></h2>
+<p><b>What&#x27;s new</b></p>
+<ul>
+<li><b>See what&#x27;s new.</b> Tap the version line at the bottom of the app to open these release notes. From there, <b>Back to app</b> returns you to the app, and <b>Refresh to latest</b> reloads it to pick up the newest version.</li>
+</ul>
+<p><b>Guide</b></p>
+<ul>
+<li>The version tip now says that tapping the version shows what&#x27;s new, and that you can refresh from there.</li>
+</ul>
+
+</section>
+<section class="rel"><h2>Version 2 · 2026-Oct-13:19:23 PT</h2>
+<p><b>What&#x27;s new</b></p>
+<ul>
+<li><b>Version shown in the app.</b> A small line at the bottom of the screen now shows the version and when it was released, for example &quot;Version 2 · 2026-Oct-13:19:23&quot;. Tap it to reload and pick up the latest version.</li>
+<li><b>Version number recorded with every round.</b> Each saved round now carries the same version number shown at the bottom of the app, so the Drawmaster can tell which version recorded it. (Rounds saved before this release show the date &quot;2026-10-13&quot; instead of a number.)</li>
+</ul>
+<p><b>Behind the scenes</b></p>
+<ul>
+<li>A simple release step now updates the version number and release time together each time the app is updated.</li>
+</ul>
+<p><b>Guide</b></p>
+<ul>
+<li>New tip: check the version at the bottom of the app; if it&#x27;s older than the latest, close and reopen the app or refresh the page.</li>
+</ul>
+
+</section>
+<section class="rel"><h2>Version 1 · 2026-Oct-13:19:10 PT</h2>
+<p>The first full release of the Pace Card, built and tested 2026-Oct-11 to 2026-Oct-13.</p>
+<p><b>What the app does</b></p>
+<ul>
+<li><b>Setup Round</b> at the top of the screen: date, course, holes (18, Front 9 or Back 9), group name, target round time (type 410 for 4:10), scheduled tee time and your email (optional). The box stays yellow until course, target and tee time are filled in. &quot;Done – collapse Setup&quot; folds it away; it also folds by itself after hole 4.</li>
+<li><b>Courses:</b> Fraserview, Langara, McCleery, Kamloops Golf and Country Club, Burnaby Mountain and Riverway, picked from a drop-down.</li>
+<li><b>⛳ First tee shot hit</b> records your actual tee time. Before you tap it, the button counts down to your scheduled tee time, turning yellow in the last 5 minutes and red once you&#x27;re late.</li>
+<li><b>Checkpoints</b> after holes 4, 9, 13 and 18 (or 4 and 9 for a front nine, 13 and 18 for a back nine), with target times worked out from each hole&#x27;s par and scaled to your target.</li>
+<li><b>Pace banner</b> pinned at the top: &quot;X min AHEAD&quot;, &quot;X min BEHIND&quot; or &quot;ON PACE&quot;, with a plain-language line such as &quot;at hole 9 · round target 4:10&quot;. Green, yellow or red at a glance, plus a &quot;Next&quot; bubble showing the next checkpoint time.</li>
+<li><b>Finished hole buttons</b> that fold into a summary showing how that stretch went and the running total, with Edit and Undo.</li>
+<li><b>⏳ Wait button</b> for timing waits on the group ahead, with quick comment picks; it becomes &quot;■ Stop&quot; with a live timer.</li>
+<li><b>Round Complete</b> panel after the last hole, with Save &amp; Share Round CSV, Save only (email later) or Not yet.</li>
+<li><b>Automatic upload:</b> saved rounds go straight to the Drawmaster&#x27;s Pace Log. Without an internet connection the app holds the round and sends it later. Emailing the CSV is now a backup.</li>
+<li><b>History</b> of saved rounds, with Share Rounds CSV and Share Wait Log CSV.</li>
+<li><b>Interval allocation</b> (optional, in Setup) to tune how the round&#x27;s time is split across the four stretches, with a &quot;How are these calculated?&quot; explainer and sources.</li>
+</ul>
+<p><b>Notable changes on 2026-Oct-13</b></p>
+<ul>
+<li>Rounds are now sent to the Drawmaster automatically when saved.</li>
+<li>Setup moved to the top of the screen, turns yellow until it&#x27;s ready and has a Done button.</li>
+<li>Course is now a drop-down. Added Kamloops Golf and Country Club, Burnaby Mountain and Riverway.</li>
+<li>New Holes choice: 18, Front 9 or Back 9.</li>
+<li>Clearer pace banner wording, plus a check that catches unlikely target times (for example 1:00 for 18 holes).</li>
+<li>Tee-time countdown on the First tee shot button.</li>
+<li>The wait button is now a smaller &quot;⏳ Wait&quot; button.</li>
+<li>&quot;Captain Email&quot; renamed &quot;Your Email&quot; (Captain is reserved for the Club Captain).</li>
+<li>Each saved round records the local date and time it was saved.</li>
+<li>Interval allocation editing reworked: type any split, a running Total turns green at exactly 100%, and Save allocation only works at 100%. Cancel throws away your edits.</li>
+</ul>
+<p><b>Fixes</b></p>
+<ul>
+<li>Editing one Interval allocation % no longer changes the value you typed.</li>
+</ul>
+<p><b>Guide</b></p>
+<ul>
+<li>Guide published at wpgc-drawmaster.github.io/pace-card/guide.pdf, with install steps for iPhone and Android. Any browser works.</li>
+<li>Covers automatic upload, Setup at the top, the new courses, the Holes option, the countdown, the ⏳ Wait button, the &quot;Your Email&quot; wording and the new &quot;Tuning the Interval allocation (optional)&quot; section.</li>
+<li>&quot;Internet connection&quot; wording replaces &quot;signal&quot;.</li>
+<li>An automatic revision stamp appears on the title page and every footer.</li>
+</ul>
+</section>
+</div></body></html>

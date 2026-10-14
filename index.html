@@ -95,7 +95,7 @@ window.__st=()=>st;window.__P=P;
 {const sel=document.getElementById('course');Object.values(COURSE_NAMES).forEach(n=>{const o=document.createElement('option');o.value=o.textContent=n;sel.appendChild(o)});if(st.course){const c=st.course.toLowerCase(),k=Object.keys(COURSE_NAMES).find(k=>c.includes(k));st.course=k?COURSE_NAMES[k]:'';LS.setItem('pc_cur',JSON.stringify(st))}}
 let hist=JSON.parse(LS.getItem('pc_hist')||'[]');
 const UPLOAD_URL='https://script.google.com/macros/s/AKfycbz2yNO0msfE8xX8awzvjj226hAWziWcxx-qlZRNMqiEpfcTRm58yGQFUoB8K3Y9j2AJ/exec';// Drawmaster Apps Script /exec URL (set after deployment)
-const APP_VERSION=2;const APP_BUILD='2026-Oct-13:19:23';window.APPV='Version '+APP_VERSION+' · '+APP_BUILD;// single source of truth; bumped by release.sh
+const APP_VERSION=3;const APP_BUILD='2026-Oct-14:07:05';window.APPV='Version '+APP_VERSION+' · '+APP_BUILD;// single source of truth; bumped by release.sh
 const save=()=>{LS.setItem('pc_cur',JSON.stringify(st));LS.setItem('pc_hist',JSON.stringify(hist))};
 const nowMin=()=>{const d=new Date();return d.getHours()*60+d.getMinutes()+d.getSeconds()/60};
 const teeBase=()=>st.atee!=null?st.atee:P.hm(st.tee);const HM=()=>st.holes||'18',LAST=()=>ACT(HM()).slice(-1)[0],NEXT=()=>{const a=ACT(HM()).find(k=>st.act[k]==null);return a==null?-1:a};
@@ -240,5 +240,5 @@ let s=Math.round((d-now)/1000),bg='',fg='';
 if(s>=0){const h=Math.floor(s/3600),mm=Math.floor(s%3600/60),ss=s%60,p=n=>String(n).padStart(2,'0');lbl+=' · in '+(h?h+':'+p(mm)+':'+p(ss):mm+':'+p(ss));if(s<=300){bg='#f5c400';fg='#3a2e00'}}
 else{const late=Math.floor(-s/60);lbl+=' · '+(late<1?'now':late+' min late');bg='#d32f2f';fg='#fff'}
 c.textContent=lbl;c.style.display='block';b.style.background=bg;b.style.color=fg}
-setInterval(tick,1000);new MutationObserver(tick).observe(document.getElementById('atee'),{childList:true});tick()})();</script><div id="ver" title="Tap to check for updates" style="text-align:center;font-size:12px;opacity:.55;margin:28px 0 14px;cursor:pointer"></div>
-<script>(function(){const e=document.getElementById("ver");e.textContent=window.APPV||"";e.onclick=()=>{location.replace(location.pathname+"?v="+Date.now())}})();</script></body></html>
+setInterval(tick,1000);new MutationObserver(tick).observe(document.getElementById('atee'),{childList:true});tick()})();</script><div id="ver" title="What's new" style="text-align:center;font-size:12px;opacity:.55;margin:28px 0 14px;cursor:pointer"></div>
+<script>(function(){const e=document.getElementById("ver");e.textContent=window.APPV||"";e.onclick=()=>{location.href="releases.html"}})();</script></body></html>
