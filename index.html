@@ -48,11 +48,11 @@ button{-webkit-appearance:none;appearance:none}button.nx{position:relative;z-ind
 
 </div>
 <div style="position:sticky;top:0;z-index:3;background:#0b3d1e;padding-bottom:6px"><div id="pace">—</div><div id="live">—</div></div>
-<div id="wwrap" style="display:none"><button id="wbtn"><span style="font-size:38px;line-height:1;vertical-align:middle;margin-right:6px">⏳</span><span style="vertical-align:middle">Wait</span></button>
-<div id="wbox" class="card" style="display:none">
+<div id="wwrap" style="display:none"><div id="wbox" class="card" style="display:none">
 <label>Wait comment<input id="wcom" placeholder="e.g. Teebox 3" enterkeyhint="done"></label>
 <div id="chips"></div>
-</div></div>
+</div>
+<button id="wbtn"><span style="font-size:38px;line-height:1;vertical-align:middle;margin-right:6px">⏳</span><span style="vertical-align:middle">Wait</span></button></div>
 <div id="wlist"></div>
 
 <div id="done" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:10;align-items:center;justify-content:center;padding:16px"><div class="card" style="background:#0b3d1e;max-width:420px;width:100%;border:2px solid #fff">
@@ -96,7 +96,7 @@ window.__st=()=>st;window.__P=P;
 {const sel=document.getElementById('course');Object.values(COURSE_NAMES).forEach(n=>{const o=document.createElement('option');o.value=o.textContent=n;sel.appendChild(o)});if(st.course){const c=st.course.toLowerCase(),k=Object.keys(COURSE_NAMES).find(k=>c.includes(k));st.course=k?COURSE_NAMES[k]:'';LS.setItem('pc_cur',JSON.stringify(st))}}
 let hist=JSON.parse(LS.getItem('pc_hist')||'[]');
 const UPLOAD_URL='https://script.google.com/macros/s/AKfycbz2yNO0msfE8xX8awzvjj226hAWziWcxx-qlZRNMqiEpfcTRm58yGQFUoB8K3Y9j2AJ/exec';// Drawmaster Apps Script /exec URL (set after deployment)
-const APP_VERSION=9;const APP_BUILD='2026-Oct-14:18:10';window.APPV='Version '+APP_VERSION+' · '+APP_BUILD;// single source of truth; bumped by release.sh
+const APP_VERSION=10;const APP_BUILD='2026-Oct-14:18:16';window.APPV='Version '+APP_VERSION+' · '+APP_BUILD;// single source of truth; bumped by release.sh
 const save=()=>{LS.setItem('pc_cur',JSON.stringify(st));LS.setItem('pc_hist',JSON.stringify(hist))};
 const nowMin=()=>{const d=new Date();return d.getHours()*60+d.getMinutes()+d.getSeconds()/60};
 const teeBase=()=>st.atee!=null?st.atee:P.hm(st.tee);const HM=()=>st.holes||'18',LAST=()=>ACT(HM()).slice(-1)[0],NEXT=()=>{const a=ACT(HM()).find(k=>st.act[k]==null);return a==null?-1:a};
@@ -222,9 +222,10 @@ $('wcsv').onclick=()=>{const rows=[WH];hist.forEach(r=>rowsW(r).forEach(x=>rows.
 setInterval(()=>{if(st.wait)wrender()},1000);
 {const bar=document.createElement('div');bar.id='wbar';bar.innerHTML='<button type="button" id="wbar2"></button>';document.body.appendChild(bar);$('wbar2').onclick=()=>$('wbtn').click();
  window.WVIS=true;if('IntersectionObserver' in window)new IntersectionObserver(es=>{es.forEach(e=>{WVIS=e.isIntersecting});wbarUpd()},{threshold:0.6}).observe($('wbtn'));}
-function wbarUpd(){const on=!!st.wait&&$('wbox').style.display!=='none';document.body.classList.toggle('waiting',on);$('wbar').classList.toggle('show',on&&!WVIS);if(on)$('wbar2').textContent=$('wbtn').textContent}
-function wfocusResume(){if(!st.wait)return;const go=()=>{if(st.wait)$('wbtn').scrollIntoView({block:'center',behavior:'smooth'})};setTimeout(go,300);const vv=window.visualViewport;if(vv){const h=()=>{vv.removeEventListener('resize',h);setTimeout(go,50)};vv.addEventListener('resize',h);setTimeout(()=>vv.removeEventListener('resize',h),1500)}}
+function wbarUpd(){{const r=$('wbtn').getBoundingClientRect(),vh=window.visualViewport?visualViewport.height:innerHeight;if(r.height)WVIS=r.top>=0&&r.bottom<=vh}const on=!!st.wait&&$('wbox').style.display!=='none';document.body.classList.toggle('waiting',on);$('wbar').classList.toggle('show',on&&!WVIS);if(on)$('wbar2').textContent=$('wbtn').textContent}
+function wfocusResume(){if(!st.wait)return;const go=()=>{if(!st.wait)return;const b=$('wbtn'),r=b.getBoundingClientRect(),vh=(window.visualViewport?visualViewport.height:innerHeight);window.scrollTo(0,Math.max(0,r.top+window.scrollY-vh/2+r.height/2));wbarUpd()};[50,350,700,1100].forEach(t=>setTimeout(go,t));const vv=window.visualViewport;if(vv){const h=()=>{vv.removeEventListener('resize',h);setTimeout(go,30)};vv.addEventListener('resize',h);setTimeout(()=>vv.removeEventListener('resize',h),2000)}}
 $('wcom').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('wcom').blur()}});
+['change','focusout'].forEach(ev=>$('wcom').addEventListener(ev,()=>{if(st.wait){st.wait.comment=$('wcom').value;save()}wfocusResume()}));window.addEventListener('scroll',()=>{if(st.wait)wbarUpd()},{passive:true});if(window.visualViewport)visualViewport.addEventListener('resize',()=>{if(st.wait)wbarUpd()});
 $('wcom').addEventListener('blur',()=>{if(st.wait){st.wait.comment=$('wcom').value;save()}wfocusResume()});
 setInterval(()=>{if(window.wbarUpd)wbarUpd()},1000);
 // --- automatic upload to Drawmaster Pace Log sheet ---
