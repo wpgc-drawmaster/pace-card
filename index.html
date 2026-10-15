@@ -15,7 +15,7 @@
 *{box-sizing:border-box}body{margin:0;font-family:-apple-system,system-ui,sans-serif;background:#0b3d1e;color:#fff;padding:env(safe-area-inset-top) 12px 40px;font-size:18px}
 h1{font-size:24px;margin:12px 0}h2{font-size:20px;margin:18px 0 8px}
 #live.y{background:#ffd60a!important;color:#000!important}#live.r{background:#ff3b30!important;color:#fff!important}
-#pace{font-size:34px;font-weight:900;text-align:center;padding:16px 10px;border-radius:14px;margin-bottom:8px;background:#fff;color:#0b3d1e}#pace small{display:block;font-size:15px;font-weight:700}.g{background:#2ecc40;color:#000}.a{background:#ffd60a;color:#000}.r{background:#ff3b30;color:#fff}#pace.g{background:#2ecc40;color:#000}#pace.a{background:#ffd60a;color:#000}#pace.r{background:#ff3b30;color:#fff}
+#rclk{display:none;text-align:center;font-size:17px;font-weight:800;color:#fff;margin:-2px 0 6px;font-variant-numeric:tabular-nums}#rclk.on{display:block}#pace{font-size:34px;font-weight:900;text-align:center;padding:16px 10px;border-radius:14px;margin-bottom:8px;background:#fff;color:#0b3d1e}#pace small{display:block;font-size:15px;font-weight:700}.g{background:#2ecc40;color:#000}.a{background:#ffd60a;color:#000}.r{background:#ff3b30;color:#fff}#pace.g{background:#2ecc40;color:#000}#pace.a{background:#ffd60a;color:#000}#pace.r{background:#ff3b30;color:#fff}
 #live{background:#fff;color:#0b3d1e;font-weight:800;font-size:22px;padding:14px;border-radius:12px;}
 .card{background:#145c2e;border-radius:12px;padding:12px;margin:10px 0}
 label{display:block;font-weight:700;margin:6px 0}input,select{font-size:22px;padding:10px;border-radius:8px;border:2px solid #fff;width:100%}select{background:#fff;color:#000;display:block}
@@ -47,7 +47,7 @@ button{-webkit-appearance:none;appearance:none}button.nx{position:relative;z-ind
 </details>
 
 </div>
-<div style="position:sticky;top:0;z-index:3;background:#0b3d1e;padding-bottom:6px"><div id="pace">—</div><div id="live">—</div></div>
+<div id="stk" style="position:sticky;top:0;z-index:3;background:#0b3d1e;padding-top:env(safe-area-inset-top);padding-bottom:6px"><div id="pace">—</div><div id="rclk"></div><div id="live">—</div></div>
 <div id="wwrap" style="display:none"><div id="wbox" class="card" style="display:none">
 <label>Wait comment<input id="wcom" placeholder="e.g. Teebox 3" enterkeyhint="done"></label>
 <div id="chips"></div>
@@ -125,7 +125,8 @@ function pace(){const t=T(),i=NEXT();let last=null,lh=0;st.act.forEach((a,k)=>{i
  el.className=v>=0?'g':v>=-5?'a':'r';el.innerHTML=(v===0?'ON PACE':Math.abs(v)+' min '+(v<0?'BEHIND':'AHEAD'))+'<small>'+src+' · round target '+st.tgt+'</small>'}
 function nxGlow(i,c){document.querySelectorAll('button.nx').forEach(b=>{if(i<0||b!==nxB())b.className='big'});const b=nxB();if(!b||i<0||st.atee==null){window.NXS=null;return}const k=i+':'+c,pv=window.NXS;window.NXS=k;let p=Date.now()<(window.NXP||0);if(pv!==undefined&&pv!==null&&pv!==k&&c&&pv.split(':')[0]==String(i)){p=true;window.NXP=Date.now()+1100;clearTimeout(window.NXT);window.NXT=setTimeout(()=>{const x=nxB();if(x)x.classList.remove('p')},1100)}else if(pv!==k){p=false;window.NXP=0}b.className='big nx'+(c?' '+c:'')+(p?' p':'')}
 function nxB(){return document.querySelector('#cps [data-open] button')}
-function live(){document.querySelectorAll('button.nx').forEach(b=>b.className='big');if(!ready()){$('pace').className='';$('pace').innerHTML='Set up your round<small>Setup Round is at the top of the screen</small>';$('live').className='';$('live').textContent='Next: complete Setup Round';return}pace();const t=T(),i=NEXT();if(i<0){const L=LAST(),d=-Math.round(st.act[L]-t[L])||0;$('live').className='';$('live').textContent='Round done: '+P.sgn(d)+' vs '+st.tgt;return}
+function rclk(){const e=$('rclk');if(!e)return;if(!ready()||st.atee==null){e.className='';return}const i=NEXT(),b=teeBase(),end=i<0?st.act[LAST()]:nowMin(),m=Math.max(0,Math.round(end-b));e.className='on';e.textContent=(i<0?'Round time ':'⏱ Round ')+Math.floor(m/60)+':'+String(m%60).padStart(2,'0')}
+function live(){rclk();document.querySelectorAll('button.nx').forEach(b=>b.className='big');if(!ready()){$('pace').className='';$('pace').innerHTML='Set up your round<small>Setup Round is at the top of the screen</small>';$('live').className='';$('live').textContent='Next: complete Setup Round';return}pace();const t=T(),i=NEXT();if(i<0){const L=LAST(),d=-Math.round(st.act[L]-t[L])||0;$('live').className='';$('live').textContent='Round done: '+P.sgn(d)+' vs '+st.tgt;return}
  const rem=t[i]-nowMin(),togo=Math.round(rem);$('live').className=rem<0?'r':rem<=5?'y':'';nxGlow(i,rem<0?'r':rem<=5?'y':'');$('live').textContent='Next: hole '+HOLES[i]+' by '+P.fmt12(t[i])+' — '+(togo>=0?togo+' min to go':(-togo)+' min over')}
 window.rec=i=>{if(i==LAST())st.dismiss=false;st.act[i]=Math.round(nowMin());save();render()};
 window.un=i=>{st.act[i]=null;if(i==LAST())st.dismiss=false;save();render()};
