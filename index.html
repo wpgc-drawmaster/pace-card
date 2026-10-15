@@ -20,7 +20,7 @@ h1{font-size:24px;margin:12px 0}h2{font-size:20px;margin:18px 0 8px}
 .card{background:#145c2e;border-radius:12px;padding:12px;margin:10px 0}
 label{display:block;font-weight:700;margin:6px 0}input,select{font-size:22px;padding:10px;border-radius:8px;border:2px solid #fff;width:100%}select{background:#fff;color:#000;display:block}
 button{font-size:20px;font-weight:800;border:0;border-radius:12px;padding:14px;min-height:56px;cursor:pointer}
-#wbtn{display:block;width:50%;min-width:160px;margin:10px auto 0;font-size:19px;min-height:48px;background:#ff9f0a;color:#000;font-weight:900;border-radius:999px;border:0}#wbar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:50;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:rgba(11,61,30,.94);box-shadow:0 -4px 14px rgba(0,0,0,.35)}#wbar.show{display:block}#wbar button{display:block;width:100%;max-width:420px;margin:0 auto;background:#ff3b30;color:#fff;font-size:22px;font-weight:900;min-height:56px;border-radius:999px;font-variant-numeric:tabular-nums}body.waiting{padding-bottom:calc(96px + env(safe-area-inset-bottom))}#wbtn.on{background:#ff3b30;color:#fff;font-variant-numeric:tabular-nums}
+#wbtn{display:block;width:50%;min-width:160px;margin:10px auto 0;font-size:19px;min-height:48px;background:#ff9f0a;color:#000;font-weight:900;border-radius:999px;border:0}#wbar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:50;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:rgba(11,61,30,.94);box-shadow:0 -4px 14px rgba(0,0,0,.35)}#wbar.show{display:block}#wbar button{display:block;width:100%;max-width:420px;margin:0 auto;background:#ff3b30;color:#fff;font-size:22px;font-weight:900;min-height:56px;border-radius:999px;font-variant-numeric:tabular-nums}body.waiting{padding-bottom:calc(96px + env(safe-area-inset-bottom))}#wrow{display:flex;gap:10px;justify-content:center;align-items:center;margin-top:10px}#wrow #wbtn{margin:0;width:auto;flex:0 1 50%}#nbtn{font-size:17px;min-height:48px;padding:8px 16px;border-radius:999px;background:#e8f3ea;color:#0b3d1e;font-weight:800;white-space:nowrap}#wbtn.on{background:#ff3b30;color:#fff;font-variant-numeric:tabular-nums}
 .wrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid #2e7d4f}.wtxt{flex:1;min-width:0}.wt{font-size:14px;opacity:.8}.wc{font-size:16px;opacity:.95}.wbtns{display:flex;gap:6px;flex-shrink:0}.wb{width:40px;height:40px;border:0;border-radius:10px;background:#e8f5e9;color:#0b3d1e;font-size:18px;padding:0}
 .chip{background:#e8f5e9;color:#0b3d1e;border:0;border-radius:16px;padding:6px 10px;margin:4px 4px 0 0;font-size:15px}
 .big{width:100%;background:#fff;color:#0b3d1e;font-size:24px;min-height:72px}
@@ -52,7 +52,7 @@ button{-webkit-appearance:none;appearance:none}button.nx{position:relative;z-ind
 <label>Wait comment<input id="wcom" placeholder="e.g. Teebox 3" enterkeyhint="done"></label>
 <div id="chips"></div>
 </div>
-<button id="wbtn"><span style="font-size:38px;line-height:1;vertical-align:middle;margin-right:6px">⏳</span><span style="vertical-align:middle">Wait</span></button></div>
+<div id="wrow"><button id="wbtn"><span style="font-size:38px;line-height:1;vertical-align:middle;margin-right:6px">⏳</span><span style="vertical-align:middle">Wait</span></button><button id="nbtn" type="button">📝 Note</button></div><div id="nbox" class="card" style="display:none"><label>Note<input id="ntxt" placeholder="e.g. Marshal asked us to speed up" enterkeyhint="done"></label><div style="display:flex;gap:8px;margin-top:8px"><button type="button" class="sm" id="nsave">Save note</button><button type="button" class="sm" id="ncan">Cancel</button></div></div></div>
 <div id="wlist"></div>
 
 <div id="done" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:10;align-items:center;justify-content:center;padding:16px"><div class="card" style="background:#0b3d1e;max-width:420px;width:100%;border:2px solid #fff">
@@ -96,7 +96,7 @@ window.__st=()=>st;window.__P=P;
 {const sel=document.getElementById('course');Object.values(COURSE_NAMES).forEach(n=>{const o=document.createElement('option');o.value=o.textContent=n;sel.appendChild(o)});if(st.course){const c=st.course.toLowerCase(),k=Object.keys(COURSE_NAMES).find(k=>c.includes(k));st.course=k?COURSE_NAMES[k]:'';LS.setItem('pc_cur',JSON.stringify(st))}}
 let hist=JSON.parse(LS.getItem('pc_hist')||'[]');
 const UPLOAD_URL='https://script.google.com/macros/s/AKfycbz2yNO0msfE8xX8awzvjj226hAWziWcxx-qlZRNMqiEpfcTRm58yGQFUoB8K3Y9j2AJ/exec';// Drawmaster Apps Script /exec URL (set after deployment)
-const APP_VERSION=12;const APP_BUILD='2026-Oct-15:16:05';window.APPV='Version '+APP_VERSION+' · '+APP_BUILD;// single source of truth; bumped by release.sh
+const APP_VERSION=13;const APP_BUILD='2026-Oct-15:16:11';window.APPV='Version '+APP_VERSION+' · '+APP_BUILD;// single source of truth; bumped by release.sh
 const save=()=>{LS.setItem('pc_cur',JSON.stringify(st));LS.setItem('pc_hist',JSON.stringify(hist))};
 const nowMin=()=>{const d=new Date();return d.getHours()*60+d.getMinutes()+d.getSeconds()/60};
 const teeBase=()=>st.atee!=null?st.atee:P.hm(st.tee);const HM=()=>st.holes||'18',LAST=()=>ACT(HM()).slice(-1)[0],NEXT=()=>{const a=ACT(HM()).find(k=>st.act[k]==null);return a==null?-1:a};
@@ -135,15 +135,15 @@ $('dt').value=st.date;$('dt').onchange=e=>{st.date=e.target.value||st.date;save(
 $('holes').value=HM();$('holes').onchange=e=>{const h=e.target.value,on=ACT(h);st.act=st.act.map((a,k)=>on.includes(k)?a:null);st.holes=h;st.dismiss=false;const v=P.parseDur(st.tgt||'');if(v&&(h==='18'?(v<180||v>360):(v<90||v>180)))st.tgt=h==='18'?'4:10':'2:05';save();render()};
 $('tee').onchange=e=>{st.tee=e.target.value;save();render()};
 $('tgt').onchange=e=>{const v=P.parseDur(e.target.value);const n9=HM()!=='18',sug=n9?'2:05':'4:10';if(v&&(n9?(v<90||v>180):(v<180||v>360))&&!confirm('That target is '+P.fmtDur(v)+(n9?' for 9 holes':'')+'. Did you mean '+sug+'?\n\nOK to keep '+P.fmtDur(v)+', Cancel to re-enter.')){e.target.value=st.tgt||'';e.target.focus();e.target.select&&e.target.select();return}if(v){st.tgt=P.fmtDur(v)}else if(e.target.value.trim()){alert('Enter the target like 4:10, or just 410')}save();render()};
-$('rst').onclick=()=>{if(!confirm('Reset this round? Clears Course, Group Name, Target Round Duration, Scheduled Tee Time, the tee shot, all checkpoint times and waits. Saved history is kept.'))return;st={date:new Date().toISOString().slice(0,10),tee:'',tgt:'',course:'',grp:'',cap:st.cap||'',act:[null,null,null,null],atee:null,waits:[],wait:null,holes:'18'};save();$('dt').value=st.date;render();wrender()};
+$('rst').onclick=()=>{if(!confirm('Reset this round? Clears Course, Group Name, Target Round Duration, Scheduled Tee Time, the tee shot, all checkpoint times and waits. Saved history is kept.'))return;st={date:new Date().toISOString().slice(0,10),tee:'',tgt:'',course:'',grp:'',cap:st.cap||'',act:[null,null,null,null],atee:null,waits:[],notes:[],wait:null,holes:'18'};save();$('dt').value=st.date;render();wrender()};
 $('clr').onclick=()=>{if(!confirm('Delete ALL saved rounds and waits on this phone? Share the CSVs first if you need them.'))return;if(!confirm('Are you sure? This cannot be undone.'))return;hist=[];save();render()};
 window.teeNow=()=>{st.atee=Math.round(nowMin());save();render()};
 window.teeUn=()=>{st.atee=null;save();render()};
 window.teeEd=()=>{const m=st.atee;const v=prompt('Actual tee time (24h HH:MM)',String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0'));if(v&&/^\d{1,2}:\d{2}$/.test(v)){st.atee=P.hm(v);save();render()}};
 function pickCourse(){const L=Object.values(COURSE_NAMES);const v=prompt('Which course did you play? Type the number:\n'+L.map((n,i)=>(i+1)+'. '+n).join('\n'));const n=parseInt(v,10);if(n>=1&&n<=L.length){st.course=L[n-1];save();$('course').value=st.course;render();return true}alert('Please choose a Course in Setup Round before saving.');$('set').open=true;$('course').focus();return false}
 function saveRound(){if(!st.act.some(a=>a!=null))return null;if(!st.course&&!pickCourse())return null;const t=T();const base=teeBase();
- const r={id:rid(),course:st.course||'',grp:st.grp||'',cap:st.cap||'',date:st.date,tee:P.fmt12(P.hm(st.tee)),atee:st.atee!=null?P.fmt12(st.atee):'',tdel:st.atee!=null?st.atee-P.hm(st.tee):'',tgt:st.tgt,act:st.act.map(a=>a==null?'':P.fmt12(a)),delta:st.act.map((a,i)=>a==null||t[i]==null?null:Math.round(a-t[i])),waits:(st.waits||[]).slice(),rtime:st.act[LAST()]!=null?P.fmtDur(st.act[LAST()]-base):'',holes:HM(),...(()=>{const d=new Date(),p=n=>String(n).padStart(2,'0');return {sdate:d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()),stime:p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds())}})()};
- hist.push(r);st={date:new Date().toISOString().slice(0,10),tee:st.tee,tgt:st.tgt,act:[null,null,null,null],course:st.course,grp:st.grp,cap:st.cap,waits:[],wait:null,atee:null,holes:st.holes||'18'};save();$('dt').value=st.date;$('set').open=true;render();wrender();return r}
+ const r={id:rid(),course:st.course||'',grp:st.grp||'',cap:st.cap||'',date:st.date,tee:P.fmt12(P.hm(st.tee)),atee:st.atee!=null?P.fmt12(st.atee):'',tdel:st.atee!=null?st.atee-P.hm(st.tee):'',tgt:st.tgt,act:st.act.map(a=>a==null?'':P.fmt12(a)),delta:st.act.map((a,i)=>a==null||t[i]==null?null:Math.round(a-t[i])),waits:(st.waits||[]).slice(),notes:(st.notes||[]).slice(),rtime:st.act[LAST()]!=null?P.fmtDur(st.act[LAST()]-base):'',holes:HM(),...(()=>{const d=new Date(),p=n=>String(n).padStart(2,'0');return {sdate:d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()),stime:p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds())}})()};
+ hist.push(r);st={date:new Date().toISOString().slice(0,10),tee:st.tee,tgt:st.tgt,act:[null,null,null,null],course:st.course,grp:st.grp,cap:st.cap,waits:[],notes:[],wait:null,atee:null,holes:st.holes||'18'};save();$('dt').value=st.date;$('set').open=true;render();wrender();return r}
 
 $('csv').onclick=()=>{const rows=[RH].concat(hist.map(rowR));
  if(rows.length<2){alert('No saved rounds yet. Finish a round first.');return}
@@ -180,7 +180,7 @@ function allocRender(){const hm=HM(),on=ACT(hm),n9=hm!=='18',fr=courseFR(st.cour
 allocRender();
 const RH=['course','group','captain_email','date','sched_tee','actual_tee','tee_delay_min','target','round_time','h4','h9','h13','h18','d4','d9','d13','d18','total_wait_min','wait_count','holes','saved_date','saved_time'],WH=['course','date','group','captain_email','sched_tee','actual_tee','wait_no','start','end','wait_mmss','wait_min','stretch','comment'];
 function rowR(r){return [r.course||'',r.grp||'',r.cap||'',r.date,r.tee,r.atee||'',r.tdel==null?'':r.tdel,r.tgt,r.rtime||'',...r.act,...r.delta.map(d=>d==null?'':(-d||0)),wmin((r.waits||[]).reduce((s,w)=>s+w.secs,0)),(r.waits||[]).length,r.holes||'18',r.sdate||'',r.stime||'']}
-function rowsW(r){return (r.waits||[]).map((w,i)=>[r.course||'',r.date,r.grp||'',r.cap||'',r.tee,r.atee||'',i+1,hhmm(w.start),hhmm(w.end),mss(w.secs),wmin(w.secs),w.stretch||'',w.comment||''])}
+function rowsW(r){return (r.waits||[]).map((w,i)=>[r.course||'',r.date,r.grp||'',r.cap||'',r.tee,r.atee||'',i+1,hhmm(w.start),hhmm(w.end),mss(w.secs),wmin(w.secs),w.stretch||'',w.comment||'']).concat((r.notes||[]).map(n=>[r.course||'',r.date,r.grp||'',r.cap||'',r.tee,r.atee||'','note',hhmm(n.t),hhmm(n.t),'0:00',0,n.stretch||'','Note: '+(n.text||'')]))}
 const toCSV=rows=>rows.map(r=>r.map(qv).join(',')).join('\n');
 function doneBox(){const box=$('done');const L=LAST();if(st.act[L]==null||st.dismiss){box.style.display='none';$('reopen').style.display=st.act[L]!=null?'inline-block':'none';return}
  $('reopen').style.display='none';const t=T(),d=-Math.round(st.act[L]-t[L])||0,rt=st.act[L]-teeBase(),ws=st.waits||[],tw=ws.reduce((s,w)=>s+w.secs,0);
@@ -191,7 +191,7 @@ function doneBox(){const box=$('done');const L=LAST();if(st.act[L]==null||st.dis
   +'<p>Waits <b>'+ws.length+'</b> · total <b>'+mss(tw)+'</b>'+(st.wait?' <i>(a wait is still running and will be stopped)</i>':'')+'</p>';
  box.style.display='flex'}
 $('dsend').onclick=()=>{if(st.wait)$('wbtn').onclick();const r=saveRound();if(!r)return;
- const tag=fslug([r.date,r.course,r.grp]);const f=[['wpgc-pace-round-'+tag+'.csv',toCSV([RH,rowR(r)])]];if(r.waits.length)f.push(['wpgc-wait-log-'+tag+'.csv',toCSV([WH].concat(rowsW(r)))]);
+ const tag=fslug([r.date,r.course,r.grp]);const f=[['wpgc-pace-round-'+tag+'.csv',toCSV([RH,rowR(r)])]];if(r.waits.length||(r.notes||[]).length)f.push(['wpgc-wait-log-'+tag+'.csv',toCSV([WH].concat(rowsW(r)))]);
  upload(r);shareFiles(f,'WPGC Pace Round '+[r.course,r.grp,r.date].filter(Boolean).join(' - '))};
 $('dsave').onclick=()=>{if(st.wait)$('wbtn').onclick();const r=saveRound();if(r)upload(r)};
 $('dlater').onclick=()=>{st.dismiss=true;save();doneBox()};
@@ -213,11 +213,21 @@ $('wbtn').onclick=()=>{st.waits=st.waits||[];
  else{const w=st.wait;w.end=Date.now();w.secs=Math.round((w.end-w.start)/1000);w.comment=$('wcom').value.trim();st.waits.push(w);st.wait=null}
  save();wrender();wbarUpd()};
 window.wedit=i=>{const c=prompt('Comment for wait '+(i+1),st.waits[i].comment||'');if(c!=null){st.waits[i].comment=c.trim();save();wrender()}};
+const esc=x=>String(x==null?'':x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
+window.nedit=i=>{const c=prompt('Edit note',st.notes[i].text||'');if(c!=null&&c.trim()){st.notes[i].text=c.trim();save();wrender()}};
+window.ndel=i=>{if(confirm('Delete this note?')){st.notes.splice(i,1);save();wrender()}};
+{let ncx=false;const nb=$('nbox'),nt=$('ntxt');const close=()=>{nb.style.display='none';nt.value=''};
+ const commit=()=>{const v=nt.value.trim();if(v){st.notes=st.notes||[];const i=NEXT();st.notes.push({t:Date.now(),stretch:stretch()+(i>=0?' (next hole '+HOLES[i]+')':''),text:v});save();wrender()}close()};
+ $('nbtn').onclick=()=>{nb.style.display='block';nt.value='';nt.focus()};
+ $('ncan').addEventListener('pointerdown',()=>{ncx=true});$('ncan').onclick=()=>{ncx=false;close()};
+ $('nsave').addEventListener('pointerdown',()=>{ncx=true});$('nsave').onclick=()=>{ncx=false;commit()};
+ nt.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();ncx=false;commit();nt.blur()}});
+ nt.addEventListener('blur',()=>setTimeout(()=>{if(ncx||nb.style.display==='none')return;commit()},250))}
 window.wdel=i=>{if(confirm('Delete this wait?')){st.waits.splice(i,1);save();wrender()}};
 function wrender(){const on=!!st.wait;$('wbtn').className=on?'on':'';$('wbox').style.display=on?'block':'none';
  $('wbtn').innerHTML=on?'▶ Resume play '+mss((Date.now()-st.wait.start)/1000):'<span style="font-size:38px;line-height:1;vertical-align:middle;margin-right:6px">⏳</span><span style="vertical-align:middle">Wait</span>';
  const ws=st.waits||[];const tot=ws.reduce((s,w)=>s+w.secs,0);
- $('wlist').innerHTML=ws.length?'<details class="card"><summary style="font-weight:800;cursor:pointer">Waits this round: '+ws.length+' · total '+mss(tot)+'</summary>'+ws.map((w,i)=>'<div class="wrow"><div class="wtxt"><div><b>'+mss(w.secs)+'</b> <span class="wt">at '+hhmm(w.start)+'</span></div><div class="wc">'+(w.comment||'<i>no comment</i>')+'</div></div><div class="wbtns"><button class="wb" onclick="wedit('+i+')" aria-label="Edit">✎</button><button class="wb" onclick="wdel('+i+')" aria-label="Delete">✕</button></div></div>').join('')+'</details>':''}
+ const ns=st.notes||[];$('wlist').innerHTML=(ws.length||ns.length)?'<details class="card"><summary style="font-weight:800;cursor:pointer">Waits this round: '+ws.length+' · total '+mss(tot)+(ns.length?' · notes: '+ns.length:'')+'</summary>'+ns.map((n,i)=>'<div class="wrow"><div class="wtxt"><div><b>📝 Note</b> <span class="wt">at '+hhmm(n.t)+' · '+esc(n.stretch||'')+'</span></div><div class="wc">'+esc(n.text)+'</div></div><div class="wbtns"><button class="wb" onclick="nedit('+i+')" aria-label="Edit">✎</button><button class="wb" onclick="ndel('+i+')" aria-label="Delete">✕</button></div></div>').join('')+ws.map((w,i)=>'<div class="wrow"><div class="wtxt"><div><b>'+mss(w.secs)+'</b> <span class="wt">at '+hhmm(w.start)+'</span></div><div class="wc">'+(w.comment||'<i>no comment</i>')+'</div></div><div class="wbtns"><button class="wb" onclick="wedit('+i+')" aria-label="Edit">✎</button><button class="wb" onclick="wdel('+i+')" aria-label="Delete">✕</button></div></div>').join('')+'</details>':''}
 $('wcsv').onclick=()=>{const rows=[WH];hist.forEach(r=>rowsW(r).forEach(x=>rows.push(x)));
  if(rows.length<2){alert('No waits in saved rounds yet. Finish a round first.');return}
  const d=new Date().toISOString().slice(0,10);shareFiles([['wpgc-wait-log-'+d+'.csv',toCSV(rows)]],'WPGC Wait Log '+d)};
