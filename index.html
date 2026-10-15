@@ -29,6 +29,7 @@ button{font-size:20px;font-weight:800;border:0;border-radius:12px;padding:14px;m
 .d{font-weight:900;padding:4px 10px;border-radius:8px}.g{background:#2ecc40;color:#000}.a{background:#ffb300;color:#000}.r{background:#ff3b30;color:#fff}
 table{width:100%;border-collapse:collapse;font-size:15px}td,th{border-bottom:1px solid #2e7d4f;padding:4px;text-align:left}
 #setcard.unset{background:#fff3b0;border:3px solid #f5c400;color:#3a2e00}#setcard.unset summary{color:#3a2e00}#setcard.unset a{color:#5a4500}
+button.nx{--gc:255,255,255;animation:nxg 3s ease-in-out infinite}button.nx.y{--gc:255,214,10}button.nx.r{--gc:255,59,48}button.nx.p{animation:nxb .34s ease-in-out 3,nxg 3s ease-in-out 1.02s infinite}@keyframes nxg{0%,100%{box-shadow:0 0 2px 0 rgba(var(--gc),.25)}50%{box-shadow:0 0 14px 4px rgba(var(--gc),.55)}}@keyframes nxb{0%,100%{box-shadow:0 0 4px 1px rgba(var(--gc),.4)}50%{box-shadow:0 0 24px 10px rgba(var(--gc),.95)}}@media (prefers-reduced-motion:reduce){button.nx,button.nx.p{animation:none}}
 </style></head><body>
 <h1 style="display:flex;align-items:center;gap:10px"><img src="logo.png" alt="WPGC" style="width:44px;height:44px;border-radius:50%">WPGC Pace Card</h1>
 <div class="card" id="setcard">
@@ -95,7 +96,7 @@ window.__st=()=>st;window.__P=P;
 {const sel=document.getElementById('course');Object.values(COURSE_NAMES).forEach(n=>{const o=document.createElement('option');o.value=o.textContent=n;sel.appendChild(o)});if(st.course){const c=st.course.toLowerCase(),k=Object.keys(COURSE_NAMES).find(k=>c.includes(k));st.course=k?COURSE_NAMES[k]:'';LS.setItem('pc_cur',JSON.stringify(st))}}
 let hist=JSON.parse(LS.getItem('pc_hist')||'[]');
 const UPLOAD_URL='https://script.google.com/macros/s/AKfycbz2yNO0msfE8xX8awzvjj226hAWziWcxx-qlZRNMqiEpfcTRm58yGQFUoB8K3Y9j2AJ/exec';// Drawmaster Apps Script /exec URL (set after deployment)
-const APP_VERSION=3;const APP_BUILD='2026-Oct-14:07:05';window.APPV='Version '+APP_VERSION+' · '+APP_BUILD;// single source of truth; bumped by release.sh
+const APP_VERSION=4;const APP_BUILD='2026-Oct-14:17:27';window.APPV='Version '+APP_VERSION+' · '+APP_BUILD;// single source of truth; bumped by release.sh
 const save=()=>{LS.setItem('pc_cur',JSON.stringify(st));LS.setItem('pc_hist',JSON.stringify(hist))};
 const nowMin=()=>{const d=new Date();return d.getHours()*60+d.getMinutes()+d.getSeconds()/60};
 const teeBase=()=>st.atee!=null?st.atee:P.hm(st.tee);const HM=()=>st.holes||'18',LAST=()=>ACT(HM()).slice(-1)[0],NEXT=()=>{const a=ACT(HM()).find(k=>st.act[k]==null);return a==null?-1:a};
@@ -122,8 +123,10 @@ function pace(){const t=T(),i=NEXT();let last=null,lh=0;st.act.forEach((a,k)=>{i
  if(i>=0&&st.atee!=null){const over=nowMin()-t[i];if(over>0&&(v==null||-Math.round(over)<v)){v=-Math.round(over);src='heading to hole '+HOLES[i]+', running late'}}
  const el=$('pace');if(v==null){el.className='';el.innerHTML=st.atee==null?'Not teed off<small>Tap ⛳ when your first tee shot goes</small>':'ON PACE<small>heading to hole '+HOLES[i<0?LAST():i]+' · round target '+st.tgt+'</small>';return}
  el.className=v>=0?'g':v>=-5?'a':'r';el.innerHTML=(v===0?'ON PACE':Math.abs(v)+' min '+(v<0?'BEHIND':'AHEAD'))+'<small>'+src+' · round target '+st.tgt+'</small>'}
-function live(){if(!ready()){$('pace').className='';$('pace').innerHTML='Set up your round<small>Setup Round is at the top of the screen</small>';$('live').className='';$('live').textContent='Next: complete Setup Round';return}pace();const t=T(),i=NEXT();if(i<0){const L=LAST(),d=-Math.round(st.act[L]-t[L])||0;$('live').className='';$('live').textContent='Round done: '+P.sgn(d)+' vs '+st.tgt;return}
- const rem=t[i]-nowMin(),togo=Math.round(rem);$('live').className=rem<0?'r':rem<=5?'y':'';$('live').textContent='Next: hole '+HOLES[i]+' by '+P.fmt12(t[i])+' — '+(togo>=0?togo+' min to go':(-togo)+' min over')}
+function nxGlow(i,c){document.querySelectorAll('button.nx').forEach(b=>{if(i<0||b!==nxB())b.className='big'});const b=nxB();if(!b||i<0||st.atee==null){window.NXS=null;return}const k=i+':'+c,pv=window.NXS;window.NXS=k;let p=Date.now()<(window.NXP||0);if(pv!==undefined&&pv!==null&&pv!==k&&c&&pv.split(':')[0]==String(i)){p=true;window.NXP=Date.now()+1100;clearTimeout(window.NXT);window.NXT=setTimeout(()=>{const x=nxB();if(x)x.classList.remove('p')},1100)}else if(pv!==k){p=false;window.NXP=0}b.className='big nx'+(c?' '+c:'')+(p?' p':'')}
+function nxB(){return document.querySelector('#cps [data-open] button')}
+function live(){document.querySelectorAll('button.nx').forEach(b=>b.className='big');if(!ready()){$('pace').className='';$('pace').innerHTML='Set up your round<small>Setup Round is at the top of the screen</small>';$('live').className='';$('live').textContent='Next: complete Setup Round';return}pace();const t=T(),i=NEXT();if(i<0){const L=LAST(),d=-Math.round(st.act[L]-t[L])||0;$('live').className='';$('live').textContent='Round done: '+P.sgn(d)+' vs '+st.tgt;return}
+ const rem=t[i]-nowMin(),togo=Math.round(rem);$('live').className=rem<0?'r':rem<=5?'y':'';nxGlow(i,rem<0?'r':rem<=5?'y':'');$('live').textContent='Next: hole '+HOLES[i]+' by '+P.fmt12(t[i])+' — '+(togo>=0?togo+' min to go':(-togo)+' min over')}
 window.rec=i=>{if(i==LAST())st.dismiss=false;st.act[i]=Math.round(nowMin());save();render()};
 window.un=i=>{st.act[i]=null;if(i==LAST())st.dismiss=false;save();render()};
 window.ed=i=>{const v=prompt('Finish time (24h HH:MM)',(()=>{const m=st.act[i];return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')})());if(v&&/^\d{1,2}:\d{2}$/.test(v)){st.act[i]=P.hm(v);save();render()}};
