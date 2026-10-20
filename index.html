@@ -20,7 +20,7 @@ h1{font-size:24px;margin:12px 0}h2{font-size:20px;margin:18px 0 8px}
 .card{background:#145c2e;border-radius:12px;padding:12px;margin:10px 0}
 label{display:block;font-weight:700;margin:6px 0}input,select{font-size:22px;padding:10px;border-radius:8px;border:2px solid #fff;width:100%}select{background:#fff;color:#000;display:block}
 button{font-size:20px;font-weight:800;border:0;border-radius:12px;padding:14px;min-height:56px;cursor:pointer}
-#wbtn{display:block;width:50%;min-width:160px;margin:10px auto 0;font-size:19px;min-height:48px;background:#ff9f0a;color:#000;font-weight:900;border-radius:999px;border:0}#wbar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:50;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:rgba(11,61,30,.94);box-shadow:0 -4px 14px rgba(0,0,0,.35)}#wbar.show{display:block}#wbar button{display:block;width:100%;max-width:420px;margin:0 auto;background:#ff3b30;color:#fff;font-size:22px;font-weight:900;min-height:56px;border-radius:999px;font-variant-numeric:tabular-nums}body.waiting{padding-bottom:calc(96px + env(safe-area-inset-bottom))}#wrow{display:flex;gap:10px;justify-content:center;align-items:center;margin-top:10px}#wrow #wbtn{margin:0;width:auto;flex:0 1 50%}#nbtn{font-size:17px;min-height:48px;padding:8px 16px;border-radius:999px;background:#e8f3ea;color:#0b3d1e;font-weight:800;white-space:nowrap}#wbtn.on{background:#ff3b30;color:#fff;font-variant-numeric:tabular-nums}
+#wbtn{display:block;width:50%;min-width:160px;margin:10px auto 0;font-size:19px;min-height:48px;background:#ff9f0a;color:#000;font-weight:900;border-radius:999px;border:0}#gpsbox{display:none;position:fixed;left:0;right:0;bottom:0;z-index:70;padding:12px 12px calc(12px + env(safe-area-inset-bottom));background:rgba(0,0,0,.45)}#gpsbox.show{display:block}#gpsbox .gpsc{max-width:440px;margin:0 auto;background:#fff;color:#0b3d1e;border-radius:16px;padding:16px;text-align:center;box-shadow:0 -6px 24px rgba(0,0,0,.4)}#gpsbox .sm{min-height:44px}#gpsundo{display:none;position:fixed;left:12px;right:12px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:65;max-width:440px;margin:0 auto;background:#111;color:#fff;border-radius:12px;padding:10px 12px;font-weight:800;text-align:center}#gpsundo.show{display:block}#gpsundo .sm{margin-left:10px;min-height:36px;padding:6px 14px}#wbar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:50;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:rgba(11,61,30,.94);box-shadow:0 -4px 14px rgba(0,0,0,.35)}#wbar.show{display:block}#wbar button{display:block;width:100%;max-width:420px;margin:0 auto;background:#ff3b30;color:#fff;font-size:22px;font-weight:900;min-height:56px;border-radius:999px;font-variant-numeric:tabular-nums}body.waiting{padding-bottom:calc(96px + env(safe-area-inset-bottom))}#wrow{display:flex;gap:10px;justify-content:center;align-items:center;margin-top:10px}#wrow #wbtn{margin:0;width:auto;flex:0 1 50%}#nbtn{font-size:17px;min-height:48px;padding:8px 16px;border-radius:999px;background:#e8f3ea;color:#0b3d1e;font-weight:800;white-space:nowrap}#wbtn.on{background:#ff3b30;color:#fff;font-variant-numeric:tabular-nums}
 .wrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid #2e7d4f}.wtxt{flex:1;min-width:0}.wt{font-size:14px;opacity:.8}.wc{font-size:16px;opacity:.95}.wbtns{display:flex;gap:6px;flex-shrink:0}.wb{width:40px;height:40px;border:0;border-radius:10px;background:#e8f5e9;color:#0b3d1e;font-size:18px;padding:0}
 .hchip{background:#e8f5e9;color:#0b3d1e;border:2px solid #e8f5e9;border-radius:16px;padding:6px 0;margin:6px 6px 0 0;font-size:17px;font-weight:800;min-width:46px;min-height:40px}.hchip.sel{background:#b6ff3b;border-color:#fff;color:#0b3d1e}.chip{background:#e8f5e9;color:#0b3d1e;border:0;border-radius:16px;padding:6px 10px;margin:4px 4px 0 0;font-size:15px}
 .big{width:100%;background:#fff;color:#0b3d1e;font-size:24px;min-height:72px}
@@ -41,13 +41,14 @@ button{-webkit-appearance:none;appearance:none}button.nx{position:relative;z-ind
 <label>Target Round Duration (h:mm)<input id="tgt" inputmode="numeric" value="4:10" placeholder="4:10 (or type 410)"></label>
 <label>Scheduled Tee Time<input id="tee" type="time" value="09:54"></label>
 <label>Your Email (optional)<input id="cap" type="email" placeholder="you@example.com"></label>
+<div style="margin-top:8px;padding:8px;border-radius:10px;background:rgba(255,255,255,.06)"><label style="display:flex;align-items:center;gap:10px;margin:0"><input type="checkbox" id="gpson" style="width:26px;height:26px;margin:0"> <b>Auto checkpoints (GPS)</b> <span style="font-size:13px;opacity:.8">optional</span></label><div id="gpsst" style="font-size:13px;opacity:.85;margin-top:4px">Off</div></div>
 <details id="alloc" style="margin-top:8px"><summary style="font-weight:700;cursor:pointer">Interval allocation</summary><div id="allocb"></div></details>
 <div style="margin-top:8px"><button class="sm" id="rst">Reset round</button> <button class="sm" id="clr" style="background:#ffdad6">Clear all history</button></div>
 <button id="sdone" style="width:100%;margin-top:10px">Done – collapse Setup</button>
 </details>
 
 </div>
-<div id="stk" style="position:sticky;top:0;z-index:3;background:#0b3d1e;padding-top:env(safe-area-inset-top);padding-bottom:6px"><div id="pace">—</div><div id="rclk"></div><div id="live">—</div></div>
+<div id="stk" style="position:sticky;top:0;z-index:3;background:#0b3d1e;padding-top:env(safe-area-inset-top);padding-bottom:6px"><div id="pace">—</div><div id="rclk"></div><div id="live">—</div><div id="gpsnote" style="display:none;text-align:center;font-size:13px;opacity:.85;margin-top:4px">📍 Location off, use the buttons</div></div>
 <div id="wwrap" style="display:none"><div id="wbox" class="card" style="display:none">
 <label>Wait comment<input id="wcom" placeholder="e.g. Teebox 3" enterkeyhint="done"></label>
 <div id="chips"></div>
@@ -96,7 +97,7 @@ window.__st=()=>st;window.__P=P;
 {const sel=document.getElementById('course');Object.values(COURSE_NAMES).forEach(n=>{const o=document.createElement('option');o.value=o.textContent=n;sel.appendChild(o)});if(st.course){const c=st.course.toLowerCase(),k=Object.keys(COURSE_NAMES).find(k=>c.includes(k));st.course=k?COURSE_NAMES[k]:'';LS.setItem('pc_cur',JSON.stringify(st))}}
 let hist=JSON.parse(LS.getItem('pc_hist')||'[]');
 const UPLOAD_URL='https://script.google.com/macros/s/AKfycbz2yNO0msfE8xX8awzvjj226hAWziWcxx-qlZRNMqiEpfcTRm58yGQFUoB8K3Y9j2AJ/exec';// Drawmaster Apps Script /exec URL (set after deployment)
-const APP_VERSION=15;const APP_BUILD='2026-Oct-16:13:01';window.APPV='Version '+APP_VERSION+' · '+APP_BUILD;// single source of truth; bumped by release.sh
+const APP_VERSION=16;const APP_BUILD='2026-Oct-20:16:16';window.APPV='Version '+APP_VERSION+' · '+APP_BUILD;// single source of truth; bumped by release.sh
 const save=()=>{LS.setItem('pc_cur',JSON.stringify(st));LS.setItem('pc_hist',JSON.stringify(hist))};
 const nowMin=()=>{const d=new Date();return d.getHours()*60+d.getMinutes()+d.getSeconds()/60};
 const teeBase=()=>st.atee!=null?st.atee:P.hm(st.tee);const HM=()=>st.holes||'18',LAST=()=>ACT(HM()).slice(-1)[0],NEXT=()=>{const a=ACT(HM()).find(k=>st.act[k]==null);return a==null?-1:a};
@@ -115,7 +116,7 @@ function render(){if(!ready()){$('set').open=true;h4was=null;$('tee').value=st.t
  const sch=P.hm(st.tee);$('atee').innerHTML=st.atee==null?'<div class="card"><div>Scheduled tee '+P.fmt12(sch)+'</div><button class="big" id="teeb" onclick="teeNow()">⛳ First tee shot hit<span id="tcd" style="display:none;font-size:16px;font-weight:700;margin-top:4px"></span></button></div>':(()=>{const dl=st.atee-sch;return '<details class="card"><summary class="row" style="cursor:pointer;list-style:none"><span>✓ Teed off '+P.fmt12(st.atee)+'</span><span>'+(dl===0?'on time':Math.abs(dl)+' min '+(dl>0?'late':'early'))+'</span></summary><div>Scheduled '+P.fmt12(sch)+' · Actual '+P.fmt12(st.atee)+'</div><button class="sm" onclick="teeEd()">Edit</button><button class="sm" onclick="teeUn()">Undo</button></details>'})();
  {const ww=window.WW||(window.WW=$('wwrap'));document.body.appendChild(ww)}
  if(typeof allocRender==='function'&&$('allocb'))allocRender();
- $('cps').innerHTML=h;{const ww=window.WW,nx=$('cps').querySelector('[data-open]');if(st.atee!=null&&nx){$('cps').insertBefore(ww,nx);ww.style.display='block'}else if(st.wait&&!nx){$('cps').appendChild(ww);ww.style.display='block'}else ww.style.display='none'}if(typeof doneBox==='function')doneBox();live();
+ $('cps').innerHTML=h;{const ww=window.WW,nx=$('cps').querySelector('[data-open]');if(st.atee!=null&&nx){$('cps').insertBefore(ww,nx);ww.style.display='block'}else if(st.wait&&!nx){$('cps').appendChild(ww);ww.style.display='block'}else ww.style.display='none'}if(typeof doneBox==='function')doneBox();live();if(window.gpsSync)gpsSync();
  $('hist').innerHTML=hist.length?'<table><tr><th>Date</th><th>Tee</th><th>Tgt</th><th>4</th><th>9</th><th>13</th><th>18</th></tr>'+hist.slice().reverse().map(r=>'<tr><td>'+r.date+'</td><td>'+r.tee+'</td><td>'+r.tgt+'</td>'+r.delta.map(d=>'<td>'+(d==null?'':((-d||0)>0?'+':'')+(-d||0))+'</td>').join('')+'</tr>').join('')+'</table>':'<p>No saved rounds yet.</p>';
 }
 function pace(){const t=T(),i=NEXT();let last=null,lh=0;st.act.forEach((a,k)=>{if(a!=null&&t[k]!=null){last=-Math.round(a-t[k])||0;lh=HOLES[k]}});
@@ -142,7 +143,7 @@ window.teeUn=()=>{st.atee=null;save();render()};
 window.teeEd=()=>{const m=st.atee;const v=prompt('Actual tee time (24h HH:MM)',String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0'));if(v&&/^\d{1,2}:\d{2}$/.test(v)){st.atee=P.hm(v);save();render()}};
 function pickCourse(){const L=Object.values(COURSE_NAMES);const v=prompt('Which course did you play? Type the number:\n'+L.map((n,i)=>(i+1)+'. '+n).join('\n'));const n=parseInt(v,10);if(n>=1&&n<=L.length){st.course=L[n-1];save();$('course').value=st.course;render();return true}alert('Please choose a Course in Setup Round before saving.');$('set').open=true;$('course').focus();return false}
 function saveRound(){if(!st.act.some(a=>a!=null))return null;if(!st.course&&!pickCourse())return null;const t=T();const base=teeBase();
- const r={id:rid(),course:st.course||'',grp:st.grp||'',cap:st.cap||'',date:st.date,tee:P.fmt12(P.hm(st.tee)),atee:st.atee!=null?P.fmt12(st.atee):'',tdel:st.atee!=null?st.atee-P.hm(st.tee):'',tgt:st.tgt,act:st.act.map(a=>a==null?'':P.fmt12(a)),delta:st.act.map((a,i)=>a==null||t[i]==null?null:Math.round(a-t[i])),waits:(st.waits||[]).slice(),notes:(st.notes||[]).slice(),rtime:st.act[LAST()]!=null?P.fmtDur(st.act[LAST()]-base):'',holes:HM(),...(()=>{const d=new Date(),p=n=>String(n).padStart(2,'0');return {sdate:d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()),stime:p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds())}})()};
+ const r={id:rid(),course:st.course||'',grp:st.grp||'',cap:st.cap||'',date:st.date,tee:P.fmt12(P.hm(st.tee)),atee:st.atee!=null?P.fmt12(st.atee):'',tdel:st.atee!=null?st.atee-P.hm(st.tee):'',tgt:st.tgt,act:st.act.map(a=>a==null?'':P.fmt12(a)),delta:st.act.map((a,i)=>a==null||t[i]==null?null:Math.round(a-t[i])),waits:(st.waits||[]).slice(),notes:(st.notes||[]).slice(),rtime:st.act[LAST()]!=null?P.fmtDur(st.act[LAST()]-base):'',holes:HM(),agps:st.agps||0,...(()=>{const d=new Date(),p=n=>String(n).padStart(2,'0');return {sdate:d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()),stime:p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds())}})()};
  hist.push(r);st={date:new Date().toISOString().slice(0,10),tee:st.tee,tgt:st.tgt,act:[null,null,null,null],course:st.course,grp:st.grp,cap:st.cap,waits:[],notes:[],wait:null,atee:null,holes:st.holes||'18'};save();$('dt').value=st.date;$('set').open=true;render();wrender();return r}
 
 $('csv').onclick=()=>{const rows=[RH].concat(hist.map(rowR));
@@ -178,8 +179,8 @@ function allocRender(){const hm=HM(),on=ACT(hm),n9=hm!=='18',fr=courseFR(st.cour
    let c=0;const f=v.map(x=>(c+=x)/100);f[3]=1;const o=JSON.parse(localStorage.getItem('pc_alloc')||'{}');o[k]=f;localStorage.setItem('pc_alloc',JSON.stringify(o));render()}}
  $('adef').onclick=()=>{const o=JSON.parse(localStorage.getItem('pc_alloc')||'{}');delete o[k];localStorage.setItem('pc_alloc',JSON.stringify(o));render()}}
 allocRender();
-const RH=['course','group','captain_email','date','sched_tee','actual_tee','tee_delay_min','target','round_time','h4','h9','h13','h18','d4','d9','d13','d18','total_wait_min','wait_count','holes','saved_date','saved_time'],WH=['course','date','group','captain_email','sched_tee','actual_tee','wait_no','start','end','wait_mmss','wait_min','stretch','comment'];
-function rowR(r){return [r.course||'',r.grp||'',r.cap||'',r.date,r.tee,r.atee||'',r.tdel==null?'':r.tdel,r.tgt,r.rtime||'',...r.act,...r.delta.map(d=>d==null?'':(-d||0)),wmin((r.waits||[]).reduce((s,w)=>s+w.secs,0)),(r.waits||[]).length,r.holes||'18',r.sdate||'',r.stime||'']}
+const RH=['course','group','captain_email','date','sched_tee','actual_tee','tee_delay_min','target','round_time','h4','h9','h13','h18','d4','d9','d13','d18','total_wait_min','wait_count','holes','saved_date','saved_time','auto_gps'],WH=['course','date','group','captain_email','sched_tee','actual_tee','wait_no','start','end','wait_mmss','wait_min','stretch','comment'];
+function rowR(r){return [r.course||'',r.grp||'',r.cap||'',r.date,r.tee,r.atee||'',r.tdel==null?'':r.tdel,r.tgt,r.rtime||'',...r.act,...r.delta.map(d=>d==null?'':(-d||0)),wmin((r.waits||[]).reduce((s,w)=>s+w.secs,0)),(r.waits||[]).length,r.holes||'18',r.sdate||'',r.stime||'',r.agps||0]}
 function rowsW(r){return (r.waits||[]).map((w,i)=>[r.course||'',r.date,r.grp||'',r.cap||'',r.tee,r.atee||'',i+1,hhmm(w.start),hhmm(w.end),mss(w.secs),wmin(w.secs),w.stretch||'',w.comment||'']).concat((r.notes||[]).map(n=>[r.course||'',r.date,r.grp||'',r.cap||'',r.tee,r.atee||'','note',hhmm(n.t),hhmm(n.t),'0:00',0,n.hole&&n.seg?'hole '+n.hole+' ('+n.seg[0]+'-'+n.seg[1]+')':(n.stretch||''),'Note: '+(n.text||'')]))}
 const toCSV=rows=>rows.map(r=>r.map(qv).join(',')).join('\n');
 function doneBox(){const box=$('done');const L=LAST();if(st.act[L]==null||st.dismiss){box.style.display='none';$('reopen').style.display=st.act[L]!=null?'inline-block':'none';return}
@@ -246,6 +247,111 @@ $('wcom').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();
 ['change','focusout'].forEach(ev=>$('wcom').addEventListener(ev,()=>{if(st.wait){st.wait.comment=$('wcom').value;save()}wfocusResume()}));window.addEventListener('scroll',()=>{if(st.wait)wbarUpd()},{passive:true});if(window.visualViewport)visualViewport.addEventListener('resize',()=>{if(st.wait)wbarUpd()});
 $('wcom').addEventListener('blur',()=>{if(st.wait){st.wait.comment=$('wcom').value;save()}wfocusResume()});
 setInterval(()=>{if(window.wbarUpd)wbarUpd()},1000);
+// --- Auto checkpoints (GPS), optional. Prompts only; never logs without a tap. ---
+const GPS_HOLES={
+ // fraserview: [tee lat, tee lon, green lat, green lon] for holes 1-18 (OpenStreetMap golf=hole ways)
+ fraserview:[
+  [49.213017,-123.051933,49.211363,-123.048681],
+  [49.210852,-123.048042,49.210532,-123.042521],
+  [49.209820,-123.042963,49.208610,-123.043077],
+  [49.208612,-123.043885,49.210101,-123.049006],
+  [49.209527,-123.048979,49.208519,-123.045118],
+  [49.208228,-123.045895,49.208383,-123.049815],
+  [49.208936,-123.050416,49.208204,-123.052154],
+  [49.207979,-123.053804,49.210128,-123.053652],
+  [49.210816,-123.053123,49.213346,-123.052791],
+  [49.214314,-123.050539,49.217561,-123.049209],
+  [49.217594,-123.048453,49.215412,-123.045533],
+  [49.216018,-123.045124,49.213000,-123.042772],
+  [49.212594,-123.042165,49.211373,-123.042955],
+  [49.211439,-123.043869,49.214470,-123.045559],
+  [49.213519,-123.046211,49.216305,-123.047973],
+  [49.215929,-123.048234,49.214512,-123.048647],
+  [49.214110,-123.048952,49.211980,-123.045400],
+  [49.211307,-123.046185,49.213622,-123.051135]],
+ // langara: [tee lat, tee lon, green lat, green lon] for holes 1-18 (OpenStreetMap golf=hole ways)
+ langara:[
+  [49.223109,-123.113086,49.221170,-123.114820],
+  [49.220641,-123.115212,49.219457,-123.114745],
+  [49.219657,-123.113359,49.221097,-123.109087],
+  [49.221486,-123.109773,49.219969,-123.114063],
+  [49.220517,-123.114209,49.222913,-123.112380],
+  [49.223466,-123.112205,49.222694,-123.108039],
+  [49.222810,-123.107289,49.219369,-123.108587],
+  [49.220125,-123.109101,49.220761,-123.108621],
+  [49.221522,-123.108340,49.222916,-123.112084],
+  [49.223795,-123.111916,49.223262,-123.107153],
+  [49.223268,-123.106511,49.219200,-123.107866],
+  [49.218631,-123.108828,49.218446,-123.107030],
+  [49.217981,-123.107264,49.218359,-123.110775],
+  [49.218365,-123.111764,49.218190,-123.113744],
+  [49.218421,-123.113716,49.219263,-123.109363],
+  [49.219896,-123.109607,49.218393,-123.115411],
+  [49.218385,-123.116165,49.220961,-123.115829],
+  [49.221974,-123.115628,49.223362,-123.113469]],
+ // mccleery: [tee lat, tee lon, green lat, green lon] for holes 1-18 (OpenStreetMap golf=hole ways)
+ mccleery:[
+  [49.219918,-123.168554,49.216569,-123.166833],
+  [49.216126,-123.167075,49.218558,-123.168609],
+  [49.218284,-123.169133,49.216631,-123.168732],
+  [49.217703,-123.169361,49.219943,-123.171734],
+  [49.220078,-123.170604,49.220827,-123.172498],
+  [49.219514,-123.172611,49.217350,-123.172601],
+  [49.217063,-123.172229,49.217797,-123.171137],
+  [49.217866,-123.170529,49.216057,-123.167789],
+  [49.216888,-123.166344,49.220362,-123.167838],
+  [49.221679,-123.167772,49.224932,-123.168152],
+  [49.224650,-123.167146,49.220587,-123.166204],
+  [49.221113,-123.165704,49.223788,-123.166391],
+  [49.223978,-123.165984,49.222919,-123.164745],
+  [49.222564,-123.164253,49.218841,-123.164616],
+  [49.218348,-123.164387,49.215282,-123.164732],
+  [49.214773,-123.164602,49.215702,-123.166429],
+  [49.215742,-123.165557,49.218888,-123.165482],
+  [49.218475,-123.166063,49.220803,-123.167098]]};
+// Spot that means checkpoint hole H is done: the next hole's tee (5th/10th/14th), or the 18th green.
+const GPS_R=28,GPS_ACC=30;
+function gpsSpot(H,rows){return H<18?[rows[H][0],rows[H][1]]:[rows[17][2],rows[17][3]]}
+function gDist(a,b){const R=6371000,r=Math.PI/180,x=(b[1]-a[1])*r*Math.cos((a[0]+b[0])/2*r),y=(b[0]-a[0])*r;return R*Math.hypot(x,y)}
+function gSeg(p,a,b){const r=Math.PI/180,k=Math.cos(p[0]*r),X=q=>[(q[1]-p[1])*k,q[0]-p[0]],A=X(a),B=X(b),dx=B[0]-A[0],dy=B[1]-A[1],L=dx*dx+dy*dy;let t=L?-(A[0]*dx+A[1]*dy)/L:0;t=Math.max(0,Math.min(1,t));return gDist(p,[p[0]+A[1]+t*dy,p[1]+(A[0]+t*dx)/k])}
+function gHole(p,rows){let best=null,bd=1e9;rows.forEach((h,i)=>{const d=gSeg(p,[h[0],h[1]],[h[2],h[3]]);if(d<bd){bd=d;best=i+1}});return bd<=35?best:null}
+{const G={on:LS.getItem('pc_gps')==='1',watch:null,state:'',fix:null,resumed:true,snooze:{},prompt:null,off:0,last:null,undoT:null};window.GPS=G;
+ const box=document.createElement('div');box.id='gpsbox';box.innerHTML='<div class="gpsc"><div id="gpsq" style="font-size:24px;font-weight:900"></div><div id="gpsw" style="font-size:15px;margin:4px 0 8px"></div><div id="gpst" style="font-size:18px;font-weight:800;margin-bottom:8px"></div><div id="gpsadj" style="display:flex;gap:8px;justify-content:center;margin-bottom:8px"><button type="button" class="sm" id="gpsm2">−2 min</button><button type="button" class="sm" id="gpsm5">−5 min</button><button type="button" class="sm" id="gps0">Now</button></div><div style="display:flex;gap:10px"><button type="button" id="gpslog" style="flex:2;background:#2ecc40;color:#000;font-size:22px;font-weight:900">Log</button><button type="button" id="gpsno" style="flex:1;background:#e8f3ea;color:#0b3d1e;font-size:18px;font-weight:800">Not yet</button></div></div>';document.body.appendChild(box);
+ const toast=document.createElement('div');toast.id='gpsundo';document.body.appendChild(toast);
+ const rows=()=>GPS_HOLES[ckey(st.course)]&&(st.course||'').toLowerCase().includes(ckey(st.course))?GPS_HOLES[ckey(st.course)]:null;
+ const active=()=>G.on&&ready()&&st.atee!=null&&NEXT()>=0&&!!rows();
+ const stat=t=>{G.state=t;const e=$('gpsst');if(e)e.textContent=t;const n=$('gpsnote');if(n)n.style.display=(G.on&&/^Location off/.test(t)&&st.atee!=null)?'block':'none'};
+ function hide(){G.prompt=null;box.classList.remove('show')}
+ function show(i,catchup,h){if(G.prompt&&G.prompt.i===i&&G.prompt.catchup===catchup)return;G.prompt={i,catchup};G.off=0;const H=HOLES[i];
+  $('gpsq').textContent='Finished hole '+H+'? Log it now';$('gpsw').textContent=catchup?('Looks like you\'re already on hole '+h+'. Set the time you finished hole '+H+'.'):('You\'re at the '+(H<18?ord(H+1)+' tee':'18th green')+'.');
+  $('gpsadj').style.display=catchup?'flex':'none';tshow();box.classList.add('show')}
+ const ord=n=>n+(n%10==1&&n!=11?'st':n%10==2&&n!=12?'nd':n%10==3&&n!=13?'rd':'th');
+ function tshow(){$('gpst').textContent='Time: '+P.fmt12(Math.round(nowMin()+G.off))+(G.off?' ('+G.off+' min)':'')}
+ $('gpsm2').onclick=()=>{G.off-=2;tshow()};$('gpsm5').onclick=()=>{G.off-=5;tshow()};$('gps0').onclick=()=>{G.off=0;tshow()};
+ $('gpsno').onclick=()=>{if(G.prompt)G.snooze[G.prompt.i]=Date.now()+(G.prompt.catchup?5:3)*60000;hide()};
+ $('gpslog').onclick=()=>{const p=G.prompt;hide();if(!p||st.act[p.i]!=null)return;const i=p.i;if(i==LAST())st.dismiss=false;st.act[i]=Math.round(nowMin()+G.off);st.agps=(st.agps||0)+1;save();render();
+  toast.innerHTML='Logged hole '+HOLES[i]+' at '+P.fmt12(st.act[i])+' <button type="button" class="sm" id="gpsun">Undo</button>';toast.classList.add('show');clearTimeout(G.undoT);
+  $('gpsun').onclick=()=>{if(st.act[i]!=null){st.act[i]=null;st.agps=Math.max(0,(st.agps||1)-1);save();render()}toast.classList.remove('show')};G.undoT=setTimeout(()=>toast.classList.remove('show'),10000)};
+ function onFix(pos){if(!G.on||G.denied)return;const p=[pos.coords.latitude,pos.coords.longitude],acc=Math.round(pos.coords.accuracy||999),R=rows(),i=NEXT();G.fix={p,acc,t:Date.now()};if(!R||i<0||!active()){stat('GPS on · waiting for tee-off');return}
+  const H=HOLES[i],d=Math.round(gDist(p,gpsSpot(H,R)));stat('GPS on · ±'+acc+' m · hole '+H+' done spot ('+(H<18?ord(H+1)+' tee':'18th green')+'): '+d+' m');
+  const resumed=G.resumed;G.resumed=false;if(acc>GPS_ACC||st.act[i]!=null)return;
+  const h=gHole(p,R),now=Date.now();
+  const sn=G.snooze[i]>now;
+  if(d<=GPS_R){G.last=h;if(!sn)show(i,false);return}
+  if(h&&h>H&&!sn&&(resumed||G.last===h)){G.last=h;show(i,true,h);return}
+  G.last=h;if(G.prompt&&!G.prompt.catchup&&d>60)hide()}
+ function onErr(e){if(e&&e.code===1)G.denied=true;stat(e&&e.code===1?'Location off, use the buttons':'Location unavailable, use the buttons');if(e&&e.code===1)stopW()}
+ function stopW(){if(G.watch!=null&&navigator.geolocation)navigator.geolocation.clearWatch(G.watch);G.watch=null}
+ function sync(){if(!G.on){stopW();stat('Off');hide();return}if(!navigator.geolocation){stat('Location unavailable, use the buttons');return}
+  if(!active()){stopW();hide();stat(st.atee!=null&&NEXT()<0?'On · round complete':rows()||!st.course?'On · starts after tee-off':'On · no course map for '+st.course+', use the buttons');return}
+  if(G.denied){stat('Location off, use the buttons');return}
+  if(document.visibilityState!=='visible'){stopW();G.resumed=true;return}
+  if(G.watch==null){G.resumed=true;stat('GPS on · finding you…');const o={enableHighAccuracy:true,maximumAge:5000,timeout:20000};navigator.geolocation.getCurrentPosition(onFix,onErr,{enableHighAccuracy:true,maximumAge:0,timeout:20000});G.watch=navigator.geolocation.watchPosition(onFix,onErr,o)}}
+ window.gpsSync=sync;
+ document.addEventListener('visibilitychange',sync);setInterval(sync,15000);
+ const cb=$('gpson');cb.checked=G.on;cb.onchange=()=>{G.on=cb.checked;G.denied=false;LS.setItem('pc_gps',G.on?'1':'0');sync()};
+ setTimeout(sync,0)}
+
 // --- automatic upload to Drawmaster Pace Log sheet ---
 function rid(){return Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8)}
 function payload(r){const o={},w=[];RH.forEach((k,i)=>o[k]=rowR(r)[i]);o.round_id=r.id;o.app_version=APP_VERSION;
